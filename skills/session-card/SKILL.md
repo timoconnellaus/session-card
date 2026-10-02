@@ -15,7 +15,7 @@ End **every** turn with a card, wherever cards can be drawn. The user can't see 
 - **Repeat what's still open.** Any question or decision from an earlier card that hasn't been answered goes on this card again, with its buttons, until it's answered.
 - **Quick answers get a small card:** the header plus a banner, maybe one line. **Commands for the user to run** go on the card as `cmd` blocks.
 
-The description in the skill's frontmatter and a stop hook back this up: if a turn ends without a card, the hook sends a "Turn check (session-card)" nudge, and you show one then (no text before it, at most one short line after).
+The description in the skill's frontmatter and a stop hook back this up: if a turn ends without a card, the hook sends a "Turn check (session-card)" nudge, and you show one then (no text before it, then the `Next: "…"` line).
 
 ## Drawing it
 
@@ -39,7 +39,7 @@ Every card starts with a header, because the user juggles many sessions and need
 
 `summary` is one sentence for screen readers and the fallback.
 
-**The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, write at most one short line (the app needs some visible text to end a turn), and never a recap, a "let me know", or a repeat of what the card shows. Text after the card pushes it out of view.
+**The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, write exactly one short line and nothing else: the reply the user is most likely to send next, in their words, as `Next: "…"` (for example `Next: "Tried it on the phone, it works. Ship it."`). It matches the card's primary button. Claude Code's Tab suggestion is generated from the conversation, so ending on that line steers it, and the user can press Tab then Enter instead of reaching for the card. When nothing is waiting on them, use the natural follow-up (`Next: "Carry on."` or `Next: "What's left?"`). Never a recap, a "let me know", or a repeat of the card: text after the card pushes it out of view.
 
 **Only where cards can be drawn.** Cards are for the Claude desktop app, claude.ai and mobile, where `show_widget` exists. In a plain terminal session (no `show_widget` tool, even after a ToolSearch), don't show a card and don't write a text version: just end the turn as you normally would.
 

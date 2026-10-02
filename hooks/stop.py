@@ -15,8 +15,8 @@ EDIT_TOOLS = {"Edit", "Write", "NotebookEdit", "MultiEdit"}
 REASON = (
     "Turn check (session-card): this turn ended without a session card. Every turn ends with one: "
     "load the session-card skill and show it now as the very last thing, with no text before it "
-    "and at most one short line after. Say whether the work is finished, and repeat any question "
-    "still waiting on the user."
+    "and then one line: Next: \"<the reply they'll most likely send>\". Say whether the work is finished, "
+    "and repeat any question still waiting on the user."
 )
 
 

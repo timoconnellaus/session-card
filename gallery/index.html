@@ -24,7 +24,7 @@ button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:0.5
 <div class="wrap" id="wrap"></div>
 <div id="sent"></div>
 <script src="../renderer.js"></script>
-<script src="examples.js"></script>
+<script>document.write('<script src="' + ((new URLSearchParams(location.search).get('set') || 'examples').replace(/[^a-z0-9-]/gi, '')) + '.js"><\/script>')</script>
 <script>
 window.sendPrompt = (t) => { const s = document.getElementById('sent'); s.textContent += t; s.style.display = 'block'; }; // like the app: adds to the message box
 const p = new URLSearchParams(location.search);
