@@ -1,22 +1,21 @@
 ---
 name: session-card
-description: End-of-turn status card. A colour-coded inline widget showing where the session stands (done, what the user must do or decide, what Claude does next, what's blocked), built from a JSON spec by a hosted renderer, with buttons and questions the user can answer from the card. Use at the end of a turn that leaves the session in a state worth a glance (a milestone finished, tests or decisions waiting on the user, several follow-ups, a blocker, or the user coming back after a break). Skip it for quick answers, a few terminal commands, or a one-line reply.
+description: End-of-turn status card. A colour-coded inline widget showing where the session stands (done, what the user must do or decide, what Claude does next, what's blocked), built from a JSON spec by a hosted renderer, with buttons and questions the user can answer from the card. Use at the end of every turn in the Claude desktop app, claude.ai or mobile (anywhere show_widget exists); never in a plain terminal.
 ---
 
 # Session card
 
 Long chat scrollback is hard to scan, especially with ADHD. At the end of a turn the user wants one glance to answer: **where are we, and what do I need to do?** This skill draws that glance as an inline widget. You write a short JSON spec of blocks; a hosted renderer draws it. Pick the blocks that fit this moment and leave the rest out.
 
-## Show a card or not
+## Always show a card
 
-It's your call. Show one when the user would otherwise scroll to work out their next move:
+End **every** turn with a card, wherever cards can be drawn. The user can't see earlier cards once the chat moves on, so each card stands on its own:
 
-- work finished and there are follow-ups, tests to run on a device, or decisions
-- a milestone landed (merged, deployed, published): an "All done" card lets them close the session
-- something is blocked on them or on outside setup
-- they're back after a gap (30+ minutes, a resume, a compaction), or they say "where are we" or sound overwhelmed
+- **Say whether you're finished.** If the turn completed something, the card says so (a `done` banner, a `win`, or done items), even for a small change.
+- **Repeat what's still open.** Any question or decision from an earlier card that hasn't been answered goes on this card again, with its buttons, until it's answered.
+- **Quick answers get a small card:** the header plus a banner, maybe one line. **Commands for the user to run** go on the card as `cmd` blocks.
 
-Skip it when the reply already is the glance: a quick answer, a few commands to paste, a question back to them, a tiny edit. Skip it when the only change since the last card is more done items. A stop hook may send a "Turn check (session-card)" nudge after a turn that used tools; it's only a reminder, so if no card is needed, stop without writing anything more. If you show one after a nudge, skip the text before it and keep to one short line after.
+The description in the skill's frontmatter and a stop hook back this up: if a turn ends without a card, the hook sends a "Turn check (session-card)" nudge, and you show one then (no text before it, at most one short line after).
 
 ## Drawing it
 

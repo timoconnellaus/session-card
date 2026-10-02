@@ -4,7 +4,7 @@ a session card. Claude may decline; the nudge never repeats in a turn.
 
 SESSION_CARD_HOOK=0 turns it off. It stays quiet in a plain terminal
 (CLAUDE_CODE_ENTRYPOINT=cli) unless SESSION_CARD_TERMINAL=1. SESSION_CARD_MIN_TOOLS sets how many tool
-calls count as real work (default 3; any file edit always counts).
+calls a turn needs before the hook nudges (default 0: every turn).
 """
 import json
 import os
@@ -13,11 +13,10 @@ import sys
 EDIT_TOOLS = {"Edit", "Write", "NotebookEdit", "MultiEdit"}
 
 REASON = (
-    "Turn check (session-card): this turn did real work. If a status card would help the user "
-    "see where the session stands (follow-ups, things for them to try or decide, a blocker, "
-    "or a finished milestone), load the session-card skill and show one now as the very last thing, "
-    "with at most one short line after it. If it wouldn't help (the reply is a quick answer, a few commands, or a question "
-    "for them), stop now and say nothing more."
+    "Turn check (session-card): this turn ended without a session card. Every turn ends with one: "
+    "load the session-card skill and show it now as the very last thing, with no text before it "
+    "and at most one short line after. Say whether the work is finished, and repeat any question "
+    "still waiting on the user."
 )
 
 
@@ -50,7 +49,7 @@ def main():
     if not path or not os.path.exists(path):
         return
     try:
-        min_tools = int(os.environ.get("SESSION_CARD_MIN_TOOLS", "3"))
+        min_tools = int(os.environ.get("SESSION_CARD_MIN_TOOLS", "0"))
     except ValueError:
         min_tools = 3
 

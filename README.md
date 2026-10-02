@@ -5,7 +5,7 @@ End-of-turn status cards for Claude Code. When a turn leaves something for you t
 - **Composed, not templated.** Claude picks blocks from a kit (banner, lanes, one next step, progress track, scoreboard, git and PR state, test evidence, deploys, diff, risk and rollback, and more) to fit the moment, A2UI style.
 - **Answer from the card.** Decisions with a recommended option, batches of yes/no questions, approve-with-a-tweak, reordering next steps, parking open threads and device-test checklists. Everything on the card is sent back as one message.
 - **Honest.** The skill's rules stop Claude marking things green without evidence from the session, and show "not run" and "stale" as states of their own.
-- **Optional.** A stop hook nudges Claude once after a turn that did real work. Claude skips the card when a plain reply is clearer.
+- **Every turn.** Each turn ends with a card that says whether the work is finished and repeats anything still waiting on you, since earlier cards scroll away. A stop hook nudges Claude once if a turn ends without one.
 - Follows light and dark mode, and works on phone widths.
 
 Cards appear only in the Claude desktop app, claude.ai and mobile, where the `show_widget` tool is available. In a plain terminal the skill and the hook stay out of the way.
@@ -33,7 +33,7 @@ Claude writes a short JSON spec and calls `show_widget` with:
 
 - `SESSION_CARD_HOOK=0` turns the stop hook off and keeps the skill.
 - `SESSION_CARD_TERMINAL=1` lets the hook nudge in a terminal session too (off by default).
-- `SESSION_CARD_MIN_TOOLS=5` sets how many tool calls in a turn count as real work (the default is 3; any file edit always counts).
+- `SESSION_CARD_MIN_TOOLS=3` makes the hook nudge only after turns with at least that many tool calls or a file edit (the default is 0: every turn).
 
 ## Developing
 
