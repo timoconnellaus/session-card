@@ -2,7 +2,8 @@
 """Stop hook: after a turn that did real work, nudge Claude once to consider
 a session card. Claude may decline; the nudge never repeats in a turn.
 
-SESSION_CARD_HOOK=0 turns it off. SESSION_CARD_MIN_TOOLS sets how many tool
+SESSION_CARD_HOOK=0 turns it off. It stays quiet in a plain terminal
+(CLAUDE_CODE_ENTRYPOINT=cli) unless SESSION_CARD_TERMINAL=1. SESSION_CARD_MIN_TOOLS sets how many tool
 calls count as real work (default 3; any file edit always counts).
 """
 import json
@@ -34,6 +35,10 @@ def is_real_prompt(entry):
 
 def main():
     if os.environ.get("SESSION_CARD_HOOK") == "0":
+        return
+    # Cards need the desktop app, claude.ai or mobile; a plain terminal can't draw them.
+    entry = os.environ.get("CLAUDE_CODE_ENTRYPOINT", "")
+    if (not entry or entry == "cli") and os.environ.get("SESSION_CARD_TERMINAL") != "1":
         return
     try:
         data = json.load(sys.stdin)

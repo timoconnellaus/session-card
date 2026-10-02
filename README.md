@@ -8,7 +8,7 @@ End-of-turn status cards for Claude Code. When a turn leaves something for you t
 - **Optional.** A stop hook nudges Claude once after a turn that did real work. Claude skips the card when a plain reply is clearer.
 - Follows light and dark mode, and works on phone widths.
 
-Cards render in the Claude desktop app and claude.ai, where the `show_widget` tool is available. In a plain terminal, Claude falls back to a few coloured lines of text.
+Cards appear only in the Claude desktop app, claude.ai and mobile, where the `show_widget` tool is available. In a plain terminal the skill and the hook stay out of the way.
 
 ## Install
 
@@ -32,6 +32,7 @@ Claude writes a short JSON spec and calls `show_widget` with:
 ## Settings
 
 - `SESSION_CARD_HOOK=0` turns the stop hook off and keeps the skill.
+- `SESSION_CARD_TERMINAL=1` lets the hook nudge in a terminal session too (off by default).
 - `SESSION_CARD_MIN_TOOLS=5` sets how many tool calls in a turn count as real work (the default is 3; any file edit always counts).
 
 ## Developing

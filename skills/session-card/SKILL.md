@@ -36,7 +36,7 @@ window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById(
 
 **The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, end the turn with no text at all: no recap, no "let me know", no repeat of what the card shows. Text after the card pushes it out of view.
 
-No widget tool (plain terminal)? Write 3–8 lines of markdown with coloured circles as lane markers: 🟠 you, 🔴 blocked, 🔵 Claude next, 🟢 done. Your items go first. For questions, number them and say how to answer briefly ("Reply `1a 2y`, or `ok` to take my picks").
+**Only where cards can be drawn.** Cards are for the Claude desktop app, claude.ai and mobile, where `show_widget` exists. In a plain terminal session (no `show_widget` tool, even after a ToolSearch), don't show a card and don't write a text version: just end the turn as you normally would.
 
 ## Sorting what happened
 
