@@ -25,7 +25,7 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.3.0/renderer.js" integrity="sha384-Rv12+k8nsAd/AC6tGcYhayOMOzVGPOL7bxCgfESzLnfXdVPIOxWBpOuTCt2xVpAw" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.4.0/renderer.js" integrity="sha384-mZ3BhLObqImwWkNesPBmUz3cQTxtloxwx6dq3Hj9jdOmX2PeVp/M/rinDWvWzfj/" crossorigin="anonymous"></script>
 <script>
 const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
@@ -85,9 +85,9 @@ Every block is `{"type": ..., ...}`. Items in lists are a string or `{"text", "l
 **Status**
 - `banner` `{state, title?, sub?, bar?: [states], icon?}`. Default titles: you "Your turn", done "All done", next "Claude's on it", stop "Blocked". `sub` says how much is on the user ("2 things · about 7 min"). `bar` (3+ states) is one segment per tracked item.
 - `back` `{ago, doing, last, now}`: where you left off. Above the banner, only on the first card after a break.
-- `lanes` `{lanes: [{state, items, hot?, title?, foldSummary?}]}`: side-by-side columns. Default titles: done "Done", you "Your move", next "Then Claude", stop "Blocked". A `you` lane is numbered.
+- `lanes` `{lanes: [{state, items, hot?, title?, foldSummary?}]}`: sections stacked one under another (the whole card reads top to bottom). Default titles: done "Done", you "Your move", next "Then Claude", stop "Blocked". A `you` lane is numbered.
 - `step` `{title, checks?: [text], cost?, effort?, label?}`: one big next action with a local checklist. For "if you only do one thing" and low-energy cards.
-- `track` `{stages: [{label, state}]}`: 3–6 stages with "you are here".
+- `track` `{stages: [{label, state}]}`: a vertical stepper, 3–6 stages with "you are here".
 - `tiles` `{tiles: [{state, label, value}]}`: counts.
 - `rows` `{rows: [{state, text, tag?, cost?, buttons?}]}`: one tagged list, for many items. Order: you, stop, next, done.
 - `win` `{text, meta?}`: progress since the last card ("**+3 done** since your last look"). Facts only, no praise.
