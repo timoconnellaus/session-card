@@ -136,6 +136,7 @@ The renderer is pinned to a version tag, with an integrity hash. Widgets can onl
   2. Commit and tag `vX.Y.Z`.
   3. In the skill, point the renderer URL at the new tag and update its `integrity` hash (`openssl dgst -sha384 -binary renderer.js | openssl base64 -A`).
   4. Bump `.claude-plugin/plugin.json`.
+  5. Wait about 30 seconds before fetching the new tag from jsDelivr. A fetch that comes too early caches "file not found". If that happens, clear it with `curl https://purge.jsdelivr.net/gh/timoconnellaus/session-card@vX.Y.Z/renderer.js`, then check the hash matches.
 
   Old tags keep working, so cards drawn by older installs don't break.
 
