@@ -24,7 +24,7 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.0/renderer.js" integrity="sha384-eYM2phckUvjtV0aCxSrYnWowNmqQVzHkSzfiZKrKF1gAI7gLVxtL4LiqXrqAhAfq" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.1/renderer.js" integrity="sha384-P2lTCpfM9Oxmldx3wa8vtdQ4AHLH7z8FpFVc4FCSeBLaJIULlvQzFz602e2k6qdD" crossorigin="anonymous"></script>
 <script>
 const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);

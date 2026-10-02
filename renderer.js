@@ -2,7 +2,7 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '1.7.0';
+  const VERSION = '1.7.1';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:12px;padding:4px 0;font-size:14px;color:var(--text-primary)}
@@ -37,7 +37,7 @@
 .sc-env{display:flex;flex-direction:column;gap:6px}.sc-env>div{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text-secondary)}.sc-env>div::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}.sc-env em{margin-left:auto}.sc-env b{font-size:14px;color:var(--text-primary)}.sc-env code{color:var(--text-primary)}.sc-env em{font-style:normal;color:var(--c)}
 .sc-diff{display:flex;flex-direction:column;gap:6px;font-size:13px}.sc-diff>div{display:grid;grid-template-columns:minmax(0,1fr) auto 60px;gap:10px;align-items:center}.sc-diff code{color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sc-pm{font-family:var(--font-mono);font-size:12px}.sc-pm ins{text-decoration:none;color:var(--sc-done);margin-right:6px}.sc-pm del{text-decoration:none;color:var(--sc-stop)}.sc-db{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--surface-1)}.sc-db i{background:var(--sc-done)}.sc-db s{background:var(--sc-stop)}
 .sc-qt{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;margin-bottom:8px}
-.sc-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;margin-top:6px;border:0.5px solid var(--border);border-radius:8px;color:var(--text-secondary);cursor:pointer}.sc-opt input{margin-top:3px}.sc-opt b{color:var(--text-primary)}.sc-opt:has(input:checked){border-color:var(--l);background:var(--b);color:var(--c)}
+.sc-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;margin-top:6px;border:0.5px solid var(--border);border-radius:8px;color:var(--text-secondary);cursor:pointer}.sc-opt input{margin-top:3px;accent-color:var(--sc-you)}.sc-opt b{color:var(--text-primary)}.sc-opt:has(input:checked){border-color:var(--l);background:var(--b);color:var(--c)}
 .sc-seg{display:inline-flex;flex-shrink:0;border:0.5px solid var(--border-strong);border-radius:8px;overflow:hidden}.sc-seg label{padding:4px 10px;font-size:13px;cursor:pointer;color:var(--text-secondary)}.sc-seg label+label{border-left:0.5px solid var(--border-strong)}.sc-seg input{position:absolute;opacity:0;pointer-events:none}.sc-seg label:has(input:checked){background:var(--b);color:var(--c)}.sc-seg label:has(input:focus-visible){outline:2px solid var(--l)}
 .sc-in{display:block;width:100%;box-sizing:border-box;margin-top:8px;font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);resize:vertical}.sc-in[aria-invalid=true]{border-color:var(--border-danger)}
 .sc-err{font-size:13px;color:var(--text-danger);margin-top:6px}.sc-err:empty{display:none}

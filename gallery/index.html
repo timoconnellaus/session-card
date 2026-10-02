@@ -14,6 +14,7 @@ body{margin:0;background:var(--surface-0);color:var(--text-primary);font-family:
 .wrap{display:flex;flex-direction:column;gap:40px;padding:24px 16px;align-items:center}
 .ex{width:100%;max-width:680px}.ex h2{font-size:13px;font-weight:500;color:var(--text-muted);margin:0 0 8px}
 body.phone .ex{max-width:343px}
+body.bare .wrap{padding:28px}body.bare .ex h2{display:none}
 button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-primary)}
 #sent{position:fixed;bottom:12px;left:12px;right:12px;max-width:680px;margin:auto;font:12px var(--font-mono);white-space:pre-wrap;background:var(--text-primary);color:var(--surface-2);padding:10px 14px;border-radius:8px;display:none}
 </style>
@@ -31,7 +32,10 @@ if (p.get('mode') === 'dark') document.documentElement.dataset.mode = 'dark';
 if (p.get('w') === 'phone') document.body.classList.add('phone');
 document.getElementById('mode').onclick = () => { p.set('mode', p.get('mode') === 'dark' ? 'light' : 'dark'); location.search = p; };
 document.getElementById('w').onclick = () => document.body.classList.toggle('phone');
-for (const [name, spec] of Object.entries(EXAMPLES)) {
+// ?only=N renders one example with no chrome around it (used for README screenshots).
+const only = p.get('only');
+if (only != null) { document.querySelector('.bar').remove(); document.body.classList.add('bare'); }
+for (const [name, spec] of Object.entries(EXAMPLES).filter((_, i) => only == null || i === +only)) {
   const ex = document.createElement('section'); ex.className = 'ex';
   ex.innerHTML = `<h2>${name}</h2><div></div>`;
   document.getElementById('wrap').appendChild(ex);
