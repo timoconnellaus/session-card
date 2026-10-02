@@ -25,7 +25,7 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.4.0/renderer.js" integrity="sha384-mZ3BhLObqImwWkNesPBmUz3cQTxtloxwx6dq3Hj9jdOmX2PeVp/M/rinDWvWzfj/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.5.0/renderer.js" integrity="sha384-SsYEZaJVDwrI6XeH87xMlXkefdV0EeWM6NnRIWZ2ifoIvij3BV1riEWXzE6qoyAm" crossorigin="anonymous"></script>
 <script>
 const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
@@ -107,7 +107,7 @@ Every block is `{"type": ..., ...}`. Items in lists are a string or `{"text", "l
 - `diff` `{files: [{path, add, del}], meta?}`: files changed; group by folder past 6.
 - `risk` `{items, rollback?, irreversible?}`: live now, blast radius, a rollback command you checked is valid.
 
-**Answering from the card** (all questions on a card are sent together as one message by a Send button the renderer adds, with a live preview; "Use your picks" appears when any option is recommended)
+**Answering from the card** (all questions on a card are sent together as one message by a green **Send answers** button the renderer adds, with a live preview; **Reset to defaults** puts the card back as you drew it, with your recommended options selected)
 - `decide` `{q, title, options: [{label, value?, why?, rec?}], other?, required?}`: one real fork, 2–4 options, mark your pick with `rec` and say if it's easy to undo.
 - `ask` `{questions: [{q, text, rec?: "yes"|"no"|"later"}], choices?}`: a batch of small yes/no/later questions.
 - `reply` `{q, title, placeholder?, min?}`: free text when options won't do.

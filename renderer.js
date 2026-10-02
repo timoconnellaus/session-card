@@ -2,7 +2,7 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '1.4.0';
+  const VERSION = '1.5.0';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:12px;padding:4px 0;font-size:14px;color:var(--text-primary)}
@@ -25,7 +25,7 @@
 .sc-note{display:flex;align-items:center;gap:10px;background:var(--b);color:var(--c);border-radius:8px;padding:10px 14px;font-size:13px}.sc-note b{color:var(--c)}
 .sc-later{border:0.5px dashed var(--border-strong);border-radius:12px;padding:12px 16px;color:var(--text-secondary)}.sc-later>div:first-child{font-size:13px;font-weight:500;margin-bottom:4px}
 .sc-cmd{display:flex;align-items:center;gap:8px;background:var(--surface-1);border-radius:8px;padding:6px 6px 6px 12px;font-family:var(--font-mono);font-size:13px}.sc-cmd code{flex:1;overflow-x:auto;white-space:nowrap}
-.sc-act,.sc-chips{display:flex;gap:8px;flex-wrap:wrap}.sc-act .sc-pri{border-color:var(--l);background:var(--b);color:var(--c)}
+.sc-act,.sc-chips{display:flex;gap:8px;flex-wrap:wrap}.sc-act .sc-pri{border-color:var(--l);background:var(--b);color:var(--c)}.sc-act .sc-go{display:inline-flex;align-items:center;gap:6px;background:var(--c);border:1px solid var(--c);color:var(--surface-2);font-weight:500;padding-left:16px;padding-right:18px}.sc-act .sc-go:hover{opacity:.9}
 .sc-back{background:var(--surface-1);border-radius:12px;padding:12px 16px}.sc-bl{display:flex;gap:10px;color:var(--text-secondary);margin-top:4px}.sc-bl>span{width:44px;flex-shrink:0;font-size:12px;color:var(--text-muted);padding-top:2px}.sc-bl.you>span,.sc-bl.you b{color:var(--c)}
 .sc-win{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--c)}.sc-win .sc-meta{margin-left:auto}
 .sc-exit{display:flex;gap:12px;align-items:flex-start;border:0.5px solid var(--l);border-radius:12px;padding:12px 16px;color:var(--text-secondary)}.sc-exit>i{font-size:20px;color:var(--c)}.sc-exit b{color:var(--text-primary)}
@@ -205,7 +205,6 @@
         const id = ctx.q({ kind: 'radio', label: b.q || b.title, req: b.required !== false, other: !!b.other });
         const opts = arr(b.options).map((o) => {
           if (typeof o === 'string') o = { label: o };
-          if (o.rec) ctx.hasRec = true;
           return `<label class="sc-opt"><input type="radio" name="${id}" value="${esc(o.value || o.label)}"${o.rec ? ' data-rec checked' : ''}><span><b>${md(o.label)}</b>${o.rec ? ' <span class="sc-pill next">Recommended</span>' : ''}${o.why ? `<br>${md(o.why)}` : ''}</span></label>`;
         }).join('');
         return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'arrows-split')}${md(b.title)}</div>${opts}${b.other ? `<input class="sc-in" placeholder="${esc(b.otherPlaceholder || 'Anything to add (optional)')}">` : ''}<div class="sc-err"></div></div>`;
@@ -217,8 +216,7 @@
           const id = ctx.q({ kind: 'radio', label: q.q || q.text, req: !!q.required });
           const seg = choices.map((c, i) => {
             const rec = q.rec && String(q.rec).toLowerCase() === String(c).toLowerCase();
-            if (rec) ctx.hasRec = true;
-            return `<label class="${cls[i % 4]}"><input type="radio" name="${id}" value="${esc(String(c).toLowerCase())}"${rec ? ' data-rec' : ''}>${esc(c)}</label>`;
+            return `<label class="${cls[i % 4]}"><input type="radio" name="${id}" value="${esc(String(c).toLowerCase())}"${rec ? ' data-rec checked' : ''}>${esc(c)}</label>`;
           }).join('');
           return `<div class="sc-row ${st(q.state, 'you')}" data-qid="${id}"><span class="sc-tx">${md(q.text)}${cost(q)}</span><span class="sc-seg">${seg}</span><div class="sc-err" style="flex-basis:100%"></div></div>`;
         }).join('')}</div>`;
@@ -229,7 +227,6 @@
       },
       approve(b) {
         const id = ctx.q({ kind: 'approve', label: b.q || b.title });
-        ctx.hasRec = true;
         return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'file-check')}${md(b.title)}</div>${b.text ? `<div class="sc-li" style="margin-bottom:10px">${md(b.text)}</div>` : ''}<span class="sc-seg"><label class="done"><input type="radio" name="${id}" value="approved" data-rec checked>Approve</label><label class="you"><input type="radio" name="${id}" value="approved with a change">With a tweak</label><label class="stop"><input type="radio" name="${id}" value="rejected">No</label></span><div data-when="approved with a change" hidden><input class="sc-in" placeholder="${esc(b.tweakPlaceholder || 'Change…')}"></div><div class="sc-err"></div></div>`;
       },
       rank(b) {
@@ -312,7 +309,7 @@
       });
       if (first) return first.querySelector('input,textarea')?.focus();
       go(message());
-      btn.textContent = 'Sent';
+      btn.innerHTML = `${icon('check')}Sent`;
     };
     root.addEventListener('change', update);
     root.addEventListener('input', (e) => {
@@ -334,9 +331,8 @@
       } else if (t.dataset.copy != null) {
         navigator.clipboard?.writeText(t.dataset.copy);
         t.textContent = 'Copied';
-      } else if (t.hasAttribute('data-fill')) {
-        root.querySelectorAll('input[data-rec]').forEach((i) => { i.checked = true; });
-        update();
+      } else if (t.hasAttribute('data-reset')) {
+        render(root, spec); // redraw exactly as first drawn: recommended picks, nothing typed, original order
       } else if (t.hasAttribute('data-send')) {
         submit(t);
       } else if (t.dataset.p) {
@@ -353,15 +349,23 @@
   }
 
   function render(target, spec) {
-    const root = typeof target === 'string' ? document.querySelector(target) : target;
+    let root = typeof target === 'string' ? document.querySelector(target) : target;
     if (!root) return;
+    if (root.dataset.scWired) { // a redraw: swap in a clean element so old listeners go with the old one
+      const fresh = root.cloneNode(false);
+      root.replaceWith(fresh);
+      root = fresh;
+    }
+    root.dataset.scWired = '1';
+    root.classList.remove('sc-sent');
     if (!document.getElementById('sc-css')) {
       const s = document.createElement('style');
       s.id = 'sc-css';
       s.textContent = CSS;
       document.head.appendChild(s);
     }
-    const ctx = { qs: [], hasRec: false, q(o) { const id = `scq${this.qs.length}`; this.qs.push({ id, ...o }); return id; } };
+    const uid = Math.random().toString(36).slice(2, 7); // radio names must not clash with another card's
+    const ctx = { qs: [], q(o) { const id = `sc${uid}q${this.qs.length}`; this.qs.push({ id, ...o }); return id; } };
     let html = renderBlocks(spec || {}, ctx);
     // Header: which session this is, for people juggling many.
     if (spec && (spec.title || spec.about)) {
@@ -369,7 +373,7 @@
     }
     if (ctx.qs.length) {
       const send = (spec && spec.send) || {};
-      html += `<div class="sc-act"><button type="button" class="sc-pri you" data-send>${esc(send.label || 'Send answers')} ↗</button>${ctx.hasRec ? '<button type="button" data-fill>Use your picks</button>' : ''}${arr(send.buttons).map((x) => button(x)).join('')}</div><div class="sc-prev" aria-live="polite"></div>`;
+      html += `<div class="sc-act"><button type="button" class="sc-go done" data-send>${esc(send.label || 'Send answers')} ↗</button><button type="button" data-reset>Reset to defaults</button>${arr(send.buttons).map((x) => button(x)).join('')}</div><div class="sc-prev" aria-live="polite"></div>`;
     }
     root.classList.add('sc');
     // The host only gives us theme variables, so read the text colour: light text means a dark screen.

@@ -23,7 +23,7 @@ Claude writes a short JSON spec and calls `show_widget` with:
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.4.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.5.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
