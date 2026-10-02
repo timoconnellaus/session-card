@@ -2,7 +2,7 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '1.1.0';
+  const VERSION = '1.3.0';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:12px;padding:4px 0;font-size:14px;color:var(--text-primary)}
@@ -44,6 +44,7 @@
 .sc-prev{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);white-space:pre-wrap;padding:8px 12px;background:var(--surface-1);border-radius:8px}
 .sc-rk{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:0.5px solid var(--border)}.sc-rk:first-of-type{border-top:0}.sc-rk>em{width:22px;font-style:normal;font-family:var(--font-mono);color:var(--c)}.sc-rk>span{flex:1}.sc-rk button{width:30px;height:30px;padding:0}.sc-rk.off>span{color:var(--text-muted);text-decoration:line-through}
 .sc-sent .sc-form,.sc-sent .sc-act{opacity:.5;pointer-events:none}
+.sc-top{display:flex;flex-direction:column;gap:2px;padding:0 2px 2px}.sc-tt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;font-weight:500;line-height:1.3}.sc-proj{font-size:11px;font-weight:500;font-family:var(--font-mono);color:var(--text-secondary);background:var(--surface-1);border:0.5px solid var(--border);border-radius:6px;padding:1px 7px}.sc-ab{font-size:13px;line-height:1.45;color:var(--text-secondary)}
 @media (max-width:520px){
 .sc-ban{flex-wrap:wrap;gap:12px;padding:14px}.sc-ic{width:36px;height:36px;font-size:20px}.sc-ban>div:nth-child(2){flex:1;min-width:0}.sc-t{font-size:19px}.sc-bar{margin-left:0;flex-basis:100%}.sc-bar span{flex:1;max-width:28px}
 .sc-step{padding:16px}.sc-big{font-size:20px}.sc-trk>div{font-size:11px}.sc-trk>div::before{right:calc(50% + 16px);width:calc(100% - 32px)}
@@ -362,6 +363,10 @@
     }
     const ctx = { qs: [], hasRec: false, q(o) { const id = `scq${this.qs.length}`; this.qs.push({ id, ...o }); return id; } };
     let html = renderBlocks(spec || {}, ctx);
+    // Header: which session this is, for people juggling many.
+    if (spec && (spec.title || spec.about)) {
+      html = `<div class="sc-top">${spec.title ? `<div class="sc-tt">${spec.project ? `<span class="sc-proj">${esc(spec.project)}</span>` : ''}<span>${md(spec.title)}</span></div>` : ''}${spec.about ? `<div class="sc-ab">${md(spec.about)}</div>` : ''}</div>` + html;
+    }
     if (ctx.qs.length) {
       const send = (spec && spec.send) || {};
       html += `<div class="sc-act"><button type="button" class="sc-pri you" data-send>${esc(send.label || 'Send answers')} ↗</button>${ctx.hasRec ? '<button type="button" data-fill>Use your picks</button>' : ''}${arr(send.buttons).map((x) => button(x)).join('')}</div><div class="sc-prev" aria-live="polite"></div>`;

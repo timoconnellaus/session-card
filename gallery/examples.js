@@ -1,6 +1,9 @@
 // Example specs: one card per common shape, covering every block type.
 window.EXAMPLES = {
   'Your turn: lanes': {
+    project: 'tims-home',
+    title: 'Voice messages on the planning page',
+    about: 'Hold-to-talk on the planning page, transcribed by Whisper and sent as answers. Built and tested; waiting on a phone check.',
     summary: 'Your turn: 2 things need you, 3 done',
     blocks: [
       { type: 'banner', state: 'you', sub: '2 things · about 7 min', bar: ['done', 'done', 'done', 'you', 'you', 'idle', 'idle'] },
@@ -46,6 +49,9 @@ window.EXAMPLES = {
     ],
   },
   'Ship check: dev workflow': {
+    project: 'tims-home',
+    title: 'Voice messages on the planning page',
+    about: 'Getting the voice feature merged and onto the phone.',
     summary: 'Ship check: branch, checks and environments',
     blocks: [
       { type: 'banner', state: 'next', title: 'Ready to ship', sub: 'Waiting on one phone check' },

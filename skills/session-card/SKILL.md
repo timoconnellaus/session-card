@@ -16,7 +16,7 @@ It's your call. Show one when the user would otherwise scroll to work out their 
 - something is blocked on them or on outside setup
 - they're back after a gap (30+ minutes, a resume, a compaction), or they say "where are we" or sound overwhelmed
 
-Skip it when the reply already is the glance: a quick answer, a few commands to paste, a question back to them, a tiny edit. Skip it when the only change since the last card is more done items. A stop hook may send a "Turn check (session-card)" nudge after a turn that used tools; it's only a reminder, so if no card is needed, stop without writing anything more. If you show one after a nudge, write nothing before or after it.
+Skip it when the reply already is the glance: a quick answer, a few commands to paste, a question back to them, a tiny edit. Skip it when the only change since the last card is more done items. A stop hook may send a "Turn check (session-card)" nudge after a turn that used tools; it's only a reminder, so if no card is needed, stop without writing anything more. If you show one after a nudge, skip the text before it and keep to one short line after.
 
 ## Drawing it
 
@@ -25,16 +25,22 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.1.0/renderer.js" integrity="sha384-gSC1dxv9ctfpQ2WxvZNAUoOqrvbDowsmpIV5wi6BbWuzWiHfgoxaaewkngIKVYI+" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.3.0/renderer.js" integrity="sha384-Rv12+k8nsAd/AC6tGcYhayOMOzVGPOL7bxCgfESzLnfXdVPIOxWBpOuTCt2xVpAw" crossorigin="anonymous"></script>
 <script>
-const spec = { "summary": "SUMMARY", "blocks": [ ... ] };
+const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
 </script>
 ```
 
+Every card starts with a header, because the user juggles many sessions and needs to know which one this is without reading back:
+
+- `title` (required): what this session is about, as a short name ("Voice messages on the planning page"). Keep it exactly the same on every card in the session, unless the work really changes.
+- `about` (required): one or two short sentences: the goal, and where it's at now ("Hold-to-talk on the planning page, sent as answers. Built and tested; waiting on a phone check.").
+- `project` (optional): the repo or folder name, shown as a small label.
+
 `summary` is one sentence for screen readers and the fallback.
 
-**The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, end the turn with no text at all: no recap, no "let me know", no repeat of what the card shows. Text after the card pushes it out of view.
+**The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, write at most one short line (the app needs some visible text to end a turn), and never a recap, a "let me know", or a repeat of what the card shows. Text after the card pushes it out of view.
 
 **Only where cards can be drawn.** Cards are for the Claude desktop app, claude.ai and mobile, where `show_widget` exists. In a plain terminal session (no `show_widget` tool, even after a ToolSearch), don't show a card and don't write a text version: just end the turn as you normally would.
 
@@ -130,6 +136,9 @@ Every block is `{"type": ..., ...}`. Items in lists are a string or `{"text", "l
 
 ```json
 {
+  "project": "tims-home",
+  "title": "Voice messages on the planning page",
+  "about": "Hold-to-talk on the planning page, sent as answers. Built and tested; waiting on a phone check.",
   "summary": "Your turn: try the mic on the phone, then say go",
   "blocks": [
     {"type": "banner", "state": "you", "sub": "2 things · about 3 min", "bar": ["done","done","done","you","you"]},

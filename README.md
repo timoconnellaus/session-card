@@ -23,8 +23,8 @@ Claude writes a short JSON spec and calls `show_widget` with:
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.1.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
-<script>SessionCard.render('#sc', { summary: "…", blocks: [ … ] })</script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.3.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
 `renderer.js` is served by jsDelivr from a version tag here. Widgets may only load scripts from a few CDNs, which is why it isn't self-hosted. The full block reference is in [skills/session-card/SKILL.md](skills/session-card/SKILL.md).
