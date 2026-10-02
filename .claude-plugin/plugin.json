@@ -1,0 +1,8 @@
+{
+  "name": "session-card",
+  "version": "1.0.0",
+  "description": "End-of-turn status cards: a colour-coded widget showing what's done, what you need to do, what Claude does next and what's blocked, with answers from the card.",
+  "author": { "name": "Tim O'Connell" },
+  "homepage": "https://github.com/timoconnellaus/session-card",
+  "license": "MIT"
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session card gallery</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<style>
+/* Stand-ins for the Claude widget host's theme variables. */
+:root{--surface-0:#F5F4EE;--surface-1:#F1EFE8;--surface-2:#FFFFFF;--text-primary:#1F1E1D;--text-secondary:#5F5E5A;--text-muted:#888780;--border:rgba(31,30,29,.12);--border-strong:rgba(31,30,29,.22);--text-success:#0F6E56;--bg-success:#E1F5EE;--border-success:#5DCAA5;--text-warning:#854F0B;--bg-warning:#FAEEDA;--border-warning:#EF9F27;--text-accent:#185FA5;--bg-accent:#E6F1FB;--border-accent:#85B7EB;--text-danger:#A32D2D;--bg-danger:#FCEBEB;--border-danger:#F09595;--border-danger:#E24B4A;--font-mono:ui-monospace,Menlo,monospace}
+:root[data-mode=dark]{--surface-0:#1F1E1D;--surface-1:#2C2C2A;--surface-2:#262624;--text-primary:#F1EFE8;--text-secondary:#B4B2A9;--text-muted:#888780;--border:rgba(241,239,232,.12);--border-strong:rgba(241,239,232,.24);--text-success:#5DCAA5;--bg-success:#04342C;--border-success:#0F6E56;--text-warning:#FAC775;--bg-warning:#412402;--border-warning:#BA7517;--text-accent:#85B7EB;--bg-accent:#042C53;--border-accent:#185FA5;--text-danger:#F09595;--bg-danger:#501313;--border-danger:#A32D2D}
+body{margin:0;background:var(--surface-0);color:var(--text-primary);font-family:system-ui,sans-serif}
+.bar{position:sticky;top:0;z-index:1;display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--surface-1);border-bottom:0.5px solid var(--border)}
+.wrap{display:flex;flex-direction:column;gap:40px;padding:24px 16px;align-items:center}
+.ex{width:100%;max-width:680px}.ex h2{font-size:13px;font-weight:500;color:var(--text-muted);margin:0 0 8px}
+body.phone .ex{max-width:343px}
+button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-primary)}
+#sent{position:fixed;bottom:12px;left:12px;right:12px;max-width:680px;margin:auto;font:12px var(--font-mono);white-space:pre-wrap;background:var(--text-primary);color:var(--surface-2);padding:10px 14px;border-radius:8px;display:none}
+</style>
+</head>
+<body>
+<div class="bar"><button id="mode">Toggle dark</button><button id="w">Toggle phone width</button></div>
+<div class="wrap" id="wrap"></div>
+<div id="sent"></div>
+<script src="../renderer.js"></script>
+<script src="examples.js"></script>
+<script>
+window.sendPrompt = (t) => { const s = document.getElementById('sent'); s.textContent = 'sendPrompt →\n' + t; s.style.display = 'block'; };
+const p = new URLSearchParams(location.search);
+if (p.get('mode') === 'dark') document.documentElement.dataset.mode = 'dark';
+if (p.get('w') === 'phone') document.body.classList.add('phone');
+document.getElementById('mode').onclick = () => { const r = document.documentElement; r.dataset.mode = r.dataset.mode === 'dark' ? '' : 'dark'; };
+document.getElementById('w').onclick = () => document.body.classList.toggle('phone');
+for (const [name, spec] of Object.entries(EXAMPLES)) {
+  const ex = document.createElement('section'); ex.className = 'ex';
+  ex.innerHTML = `<h2>${name}</h2><div></div>`;
+  document.getElementById('wrap').appendChild(ex);
+  SessionCard.render(ex.lastChild, spec);
+}
+</script>
+</body>
+</html>
