@@ -29,7 +29,7 @@ window.sendPrompt = (t) => { const s = document.getElementById('sent'); s.textCo
 const p = new URLSearchParams(location.search);
 if (p.get('mode') === 'dark') document.documentElement.dataset.mode = 'dark';
 if (p.get('w') === 'phone') document.body.classList.add('phone');
-document.getElementById('mode').onclick = () => { const r = document.documentElement; r.dataset.mode = r.dataset.mode === 'dark' ? '' : 'dark'; };
+document.getElementById('mode').onclick = () => { p.set('mode', p.get('mode') === 'dark' ? 'light' : 'dark'); location.search = p; };
 document.getElementById('w').onclick = () => document.body.classList.toggle('phone');
 for (const [name, spec] of Object.entries(EXAMPLES)) {
   const ex = document.createElement('section'); ex.className = 'ex';

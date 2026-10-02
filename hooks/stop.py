@@ -14,8 +14,8 @@ EDIT_TOOLS = {"Edit", "Write", "NotebookEdit", "MultiEdit"}
 REASON = (
     "Turn check (session-card): this turn did real work. If a status card would help the user "
     "see where the session stands (follow-ups, things for them to try or decide, a blocker, "
-    "or a finished milestone), load the session-card skill and show one now, with no extra "
-    "prose. If it wouldn't help (the reply is a quick answer, a few commands, or a question "
+    "or a finished milestone), load the session-card skill and show one now as the very last thing, "
+    "with no text before or after it. If it wouldn't help (the reply is a quick answer, a few commands, or a question "
     "for them), stop now and say nothing more."
 )
 

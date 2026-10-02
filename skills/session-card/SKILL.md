@@ -16,7 +16,7 @@ It's your call. Show one when the user would otherwise scroll to work out their 
 - something is blocked on them or on outside setup
 - they're back after a gap (30+ minutes, a resume, a compaction), or they say "where are we" or sound overwhelmed
 
-Skip it when the reply already is the glance: a quick answer, a few commands to paste, a question back to them, a tiny edit. Skip it when the only change since the last card is more done items. A stop hook may send a "Turn check (session-card)" nudge after a turn that used tools; it's only a reminder, so if no card is needed, stop without writing anything more.
+Skip it when the reply already is the glance: a quick answer, a few commands to paste, a question back to them, a tiny edit. Skip it when the only change since the last card is more done items. A stop hook may send a "Turn check (session-card)" nudge after a turn that used tools; it's only a reminder, so if no card is needed, stop without writing anything more. If you show one after a nudge, write nothing before or after it.
 
 ## Drawing it
 
@@ -25,14 +25,16 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.0.0/renderer.js" integrity="sha384-M27VVkrVTx1VPR89GO0p2WLn7kgezQ6NE4qTvdf8oG6MV9rhwLqMO4ofTICSclqC" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.1.0/renderer.js" integrity="sha384-gSC1dxv9ctfpQ2WxvZNAUoOqrvbDowsmpIV5wi6BbWuzWiHfgoxaaewkngIKVYI+" crossorigin="anonymous"></script>
 <script>
 const spec = { "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
 </script>
 ```
 
-`summary` is one sentence for screen readers and the fallback. Put any prose in your normal reply above the card, and don't repeat the card's content after it.
+`summary` is one sentence for screen readers and the fallback.
+
+**The card is the last thing the user sees.** Anything you want to say goes before the `show_widget` call, kept to a few lines, because the card already carries the status. After the call returns, end the turn with no text at all: no recap, no "let me know", no repeat of what the card shows. Text after the card pushes it out of view.
 
 No widget tool (plain terminal)? Write 3–8 lines of markdown with coloured circles as lane markers: 🟠 you, 🔴 blocked, 🔵 Claude next, 🟢 done. Your items go first. For questions, number them and say how to answer briefly ("Reply `1a 2y`, or `ok` to take my picks").
 
