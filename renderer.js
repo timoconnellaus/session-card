@@ -2,12 +2,12 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '2.0.0';
+  const VERSION = '2.2.0';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:10px;box-sizing:border-box;background:var(--surface-2);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.4;color:var(--text-primary);--sc-you:#7C3AED;--sc-you-b:#F3E8FF;--sc-you-l:#C084FC;--sc-done:#15803D;--sc-done-b:#DCFCE7;--sc-done-l:#4ADE80;--sc-next:#0E7490;--sc-next-b:#CFFAFE;--sc-next-l:#22D3EE;--sc-stop:#BE123C;--sc-stop-b:#FFE4E6;--sc-stop-l:#FB7185}
 .sc.sc-dark{--sc-you:#C084FC;--sc-you-b:rgba(192,132,252,.13);--sc-you-l:rgba(192,132,252,.55);--sc-done:#4ADE80;--sc-done-b:rgba(74,222,128,.12);--sc-done-l:rgba(74,222,128,.5);--sc-next:#22D3EE;--sc-next-b:rgba(34,211,238,.12);--sc-next-l:rgba(34,211,238,.5);--sc-stop:#FB7185;--sc-stop-b:rgba(251,113,133,.13);--sc-stop-l:rgba(251,113,133,.55)}
-.sc .done{--c:var(--sc-done);--b:var(--sc-done-b);--l:var(--sc-done-l)}.sc .you{--c:var(--sc-you);--b:var(--sc-you-b);--l:var(--sc-you-l)}.sc .next{--c:var(--sc-next);--b:var(--sc-next-b);--l:var(--sc-next-l)}.sc .stop{--c:var(--sc-stop);--b:var(--sc-stop-b);--l:var(--sc-stop-l)}.sc .idle{--c:var(--text-secondary);--b:var(--surface-1);--l:var(--border-strong)}
+.sc .done{--c:var(--sc-done);--b:var(--sc-done-b);--l:var(--sc-done-l)}.sc .you{--c:var(--sc-you);--b:var(--sc-you-b);--l:var(--sc-you-l)}.sc .next{--c:var(--sc-next);--b:var(--sc-next-b);--l:var(--sc-next-l)}.sc .stop{--c:var(--sc-stop);--b:var(--sc-stop-b);--l:var(--sc-stop-l)}.sc .idle{--c:var(--text-secondary);--b:color-mix(in srgb,var(--text-primary) 9%,transparent);--l:var(--border-strong)}
 .sc b{font-weight:500}.sc code{font-family:var(--font-mono);font-size:.92em}
 .sc button{font:inherit;font-size:12px;line-height:1.3;cursor:pointer;padding:3px 9px;border-radius:5px;border:0.5px solid var(--border-strong);background:transparent;color:var(--text-primary)}
 .sc-hd{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap}.sc-dot{width:8px;height:8px;border-radius:50%;background:var(--c);align-self:center;flex-shrink:0}.sc-st{font-size:14px;font-weight:600;color:var(--c)}.sc-tt{font-size:14px;font-weight:500}.sc-proj{font-size:11px;font-family:var(--font-mono);color:var(--text-muted)}.sc-hm{margin-left:auto;font-size:11px;color:var(--text-muted)}
@@ -16,43 +16,43 @@
 .sc-lines{display:flex;flex-direction:column;gap:3px}.sc-ln{display:flex;gap:6px}.sc-ar{color:var(--c);flex-shrink:0}.sc-ln .sc-tx2{color:var(--text-secondary)}
 .sc-sums{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--text-muted)}.sc-k{color:var(--c)}
 .sc-fold summary,.sc-sums summary{list-style:none;cursor:pointer}.sc-fold summary::-webkit-details-marker,.sc-sums summary::-webkit-details-marker{display:none}
-.sc-sh::after{content:"› show";color:var(--text-secondary);margin-left:4px}details[open]>summary .sc-sh::after{content:"› hide"}
+.sc-sh::after{content:"show";margin-left:6px;color:var(--text-muted);text-decoration:underline dotted;text-underline-offset:2px}details[open]>summary .sc-sh::after{content:"hide"}
 .sc-sums ul,.sc-fold ul{margin:3px 0 2px;padding-left:16px;color:var(--text-secondary)}
 .sc-fold{font-size:12px;color:var(--text-muted)}
-.sc-cost{font-size:10px;font-family:var(--font-mono);color:var(--text-muted);margin-left:6px;white-space:nowrap}.sc-e{display:inline-flex;gap:2px;margin-left:3px;vertical-align:middle}.sc-e s{width:4px;height:4px;border-radius:50%;background:var(--border-strong)}.sc-e s.on{background:var(--text-secondary)}
-.sc-pill{display:inline-block;font-size:11px;font-weight:500;background:var(--b);color:var(--c);border-radius:9px;padding:1px 7px;margin-right:4px}.sc-meta{font-size:11px;color:var(--text-muted)}
+.sc-cost{font-size:11px;font-family:var(--font-mono);color:var(--text-muted);margin-left:8px;white-space:nowrap}.sc-cost i.ti{margin-right:2px}.sc-e{display:inline-flex;gap:2px;margin-left:5px;vertical-align:middle}.sc-e s{width:5px;height:5px;border-radius:50%;background:var(--text-muted);opacity:.35}.sc-e s.on{background:var(--text-secondary);opacity:1}
+.sc-pill{display:inline-block;font-size:11px;font-weight:500;background:var(--b);color:var(--c);border:0.5px solid var(--l);border-radius:4px;padding:1px 7px;margin-right:4px}.sc-meta{font-size:11px;color:var(--text-muted)}
 .sc-box{border:0.5px solid var(--border);border-radius:5px;padding:8px 10px}.sc-hot{border-color:var(--l)}
-.sc-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--c);margin-bottom:4px}.sc-n{margin-left:auto;font-size:10px;font-family:var(--font-mono);color:var(--c)}
+.sc-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--c);margin-bottom:4px}.sc-n{margin-left:auto;font-size:11px;font-family:var(--font-mono);color:var(--c)}
 .sc-li{display:flex;gap:6px;color:var(--text-secondary);margin-top:3px}.sc-h+.sc-li,.sc-li:first-child{margin-top:0}.sc-li>em{font-style:normal;font-family:var(--font-mono);color:var(--c)}.sc-li b{color:var(--text-primary)}
 .sc-step{border:0.5px solid var(--l);border-radius:6px;padding:10px 12px}.sc-big{font-size:16px;font-weight:500;line-height:1.3;margin:6px 0 6px}.sc-ck{display:flex;align-items:center;gap:8px;color:var(--text-secondary);margin-top:4px}.sc-ck input{width:15px;height:15px;flex-shrink:0;accent-color:var(--sc-you)}
 .sc-trk{display:flex;flex-direction:column}.sc-trk>div{position:relative;display:flex;align-items:center;gap:10px;min-height:28px;font-size:12px;color:var(--c)}.sc-trk>div::before{content:"";position:absolute;left:8px;bottom:calc(50% + 11px);width:2px;height:6px;border-radius:1px;background:var(--l)}.sc-trk>div:first-child::before{display:none}.sc-trk i.sc-dot2{flex-shrink:0;width:18px;height:18px;border-radius:50%;background:var(--c);color:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-style:normal;box-sizing:border-box}.sc-trk .idle i.sc-dot2{background:transparent;border:1.5px solid var(--border-strong)}.sc-trk .you i.sc-dot2{box-shadow:0 0 0 3px var(--b)}.sc-trk .you{font-weight:500}
-.sc-tiles{display:flex;flex-wrap:wrap;gap:6px}.sc-tile{display:inline-flex;align-items:baseline;gap:5px;background:var(--b);color:var(--c);border-radius:9px;padding:1px 8px;font-size:12px}.sc-tile strong{order:-1;font-family:var(--font-mono);font-weight:500}
-.sc-rows{border:0.5px solid var(--border);border-radius:5px;overflow:hidden}.sc-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 10px;border-top:0.5px solid var(--border)}.sc-row:first-child{border-top:0}.sc-row.sc-on{background:var(--b)}.sc-row>.sc-tx{flex:1;min-width:150px}.sc-tag{flex-shrink:0;width:52px;text-align:center;font-size:10px;font-weight:500;border-radius:4px;padding:1px 0;background:var(--b);color:var(--c);border:0.5px solid var(--l)}
+.sc-tiles{display:flex;flex-wrap:wrap;gap:6px}.sc-tile{display:inline-flex;align-items:baseline;gap:5px;background:var(--b);color:var(--c);border:0.5px solid var(--l);border-radius:4px;padding:1px 7px;font-size:11px}.sc-tile strong{order:-1;font-family:var(--font-mono);font-weight:500}
+.sc-rows{border:0.5px solid var(--border);border-radius:5px;overflow:hidden}.sc-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 10px;border-top:0.5px solid var(--border)}.sc-row:first-child{border-top:0}.sc-row.sc-on{background:var(--b)}.sc-row>.sc-tx{flex:1;min-width:150px}.sc-tag{flex-shrink:0;min-width:48px;box-sizing:border-box;text-align:center;font-size:11px;font-weight:500;border-radius:4px;padding:1px 7px;background:var(--b);color:var(--c);border:0.5px solid var(--l)}.sc-on .sc-tag{background:transparent}
 .sc-note{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--c)}.sc-note b{color:var(--c)}
 .sc-later{font-size:12px;color:var(--text-muted)}.sc-later>div:first-child{font-weight:500;color:var(--text-secondary)}
 .sc-cmd{display:flex;align-items:center;gap:6px;background:var(--surface-1);border-radius:5px;padding:3px 3px 3px 8px;font-family:var(--font-mono);font-size:12px}.sc-cmd code{flex:1;overflow-x:auto;white-space:nowrap}
-.sc-act,.sc-chips{display:flex;gap:6px;flex-wrap:wrap}.sc-act .sc-pri{border-color:var(--l);background:var(--b);color:var(--c)}.sc-act .sc-go{background:var(--c);border-color:var(--c);color:var(--surface-2);font-weight:500}
+.sc-act,.sc-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.sc-act .sc-pri,.sc-act .sc-go{border-color:var(--l);background:var(--b);color:var(--c);font-weight:500}.sc .sc-link{border:0;background:transparent;color:var(--text-muted);text-decoration:underline dotted;text-underline-offset:2px;padding:3px 4px}.sc-goline{font-size:12px;color:var(--text-secondary)}.sc-pv{font-size:12px;color:var(--text-muted)}.sc-pv summary{list-style:none;cursor:pointer}.sc-pv summary::-webkit-details-marker{display:none}.sc-pv .sc-prev{margin-top:4px}.sc-st2{font-size:14px;color:var(--c);font-weight:400}.sc-ckr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:5px;color:var(--text-secondary)}.sc-ckr>span:first-child{flex:1;min-width:160px}
 .sc-back{font-size:12px}.sc-bl{display:flex;gap:8px;color:var(--text-secondary);margin-top:2px}.sc-bl>span{width:38px;flex-shrink:0;color:var(--text-muted)}.sc-bl.you>span,.sc-bl.you b{color:var(--c)}
 .sc-win{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--c)}.sc-win .sc-meta{margin-left:auto}
 .sc-exit{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--text-secondary)}.sc-exit>i{color:var(--c)}.sc-exit b{color:var(--text-primary)}
 .sc-skip{display:flex;gap:6px;align-items:baseline;font-size:12px;color:var(--text-muted)}.sc-skip b{color:var(--text-secondary)}
-.sc-kk{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-family:var(--font-mono);padding:1px 7px;border-radius:5px;border:0.5px solid var(--l);background:var(--b);color:var(--c)}
+.sc-kk{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:1px 7px;border-radius:4px;border:0.5px solid var(--l);background:var(--b);color:var(--c)}
 .sc-pr-h{display:flex;align-items:center;gap:6px;color:var(--c)}.sc-pr-h b{color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sc-pr-m{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:12px}.sc-pr-m span{display:inline-flex;align-items:center;gap:4px;color:var(--c)}
 .sc-ver>div{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;padding:5px 10px;font-size:12px;color:var(--text-secondary);border-top:0.5px solid var(--border)}.sc-ver>div:first-child{border-top:0}.sc-ver i{color:var(--c);font-size:14px}.sc-ver span{flex:1;min-width:0}.sc-ver b{color:var(--text-primary);margin-right:4px}.sc-ver code{font-size:11px;color:var(--c)}
 .sc-proof{display:flex;flex-direction:column;gap:5px;font-size:12px}.sc-proof>div{display:grid;grid-template-columns:70px minmax(0,1fr);column-gap:8px}.sc-proof .sc-meta{grid-column:2}.sc-proof .sc-tag{width:auto;align-self:start}
 .sc-env{display:flex;flex-direction:column;gap:3px}.sc-env>div{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:11px;color:var(--text-secondary)}.sc-env>div::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);flex-shrink:0}.sc-env b{font-size:13px;color:var(--text-primary)}.sc-env code{color:var(--text-primary)}.sc-env em{font-style:normal;color:var(--c);margin-left:auto}
 .sc-diff{display:flex;flex-direction:column;gap:3px;font-size:12px}.sc-diff>div{display:grid;grid-template-columns:minmax(0,1fr) auto 50px;gap:8px;align-items:center}.sc-diff code{color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sc-pm{font-family:var(--font-mono);font-size:11px}.sc-pm ins{text-decoration:none;color:var(--sc-done);margin-right:5px}.sc-pm del{text-decoration:none;color:var(--sc-stop)}.sc-db{display:flex;height:4px;border-radius:2px;overflow:hidden;background:var(--surface-1)}.sc-db i{background:var(--sc-done)}.sc-db s{background:var(--sc-stop)}
-.sc-qt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;margin-bottom:6px}
-.sc-opt{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;margin-top:4px;border:0.5px solid var(--border);border-radius:5px;color:var(--text-secondary);cursor:pointer}.sc-opt input{margin-top:2px;accent-color:var(--sc-you)}.sc-opt b{color:var(--text-primary)}.sc-opt:has(input:checked){border-color:var(--l);background:var(--b);color:var(--c)}
-.sc-seg{display:inline-flex;flex-shrink:0;border:0.5px solid var(--border-strong);border-radius:5px;overflow:hidden}.sc-seg label{padding:3px 9px;font-size:12px;cursor:pointer;color:var(--text-secondary)}.sc-seg label+label{border-left:0.5px solid var(--border-strong)}.sc-seg input{position:absolute;opacity:0;pointer-events:none}.sc-seg label:has(input:checked){background:var(--b);color:var(--c)}.sc-seg label:has(input:focus-visible){outline:2px solid var(--l)}
+.sc-qt{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;margin-bottom:6px}
+.sc-opt{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;margin-top:4px;border:0.5px solid var(--border);border-radius:5px;color:var(--text-secondary);cursor:pointer}.sc-opt input{margin-top:2px;accent-color:var(--sc-you)}.sc-opt b{color:var(--text-primary)}.sc-opt:has(input:checked){border-color:var(--l);background:var(--b)}
+.sc-seg{display:inline-flex;flex-shrink:0;border:0.5px solid var(--border-strong);border-radius:5px;overflow:hidden}.sc-seg label{padding:3px 9px;font-size:12px;cursor:pointer;color:var(--text-secondary)}.sc-seg label+label{border-left:0.5px solid var(--border-strong)}.sc-seg input{position:absolute;opacity:0;pointer-events:none}.sc-seg label:has(input:checked){background:var(--b);color:var(--c);box-shadow:inset 0 0 0 1px var(--l);font-weight:500}.sc-seg label:has(input:focus-visible){outline:2px solid var(--l)}
 .sc-in{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;font-size:13px;padding:5px 8px;border-radius:5px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);resize:vertical}.sc-in[aria-invalid=true]{border-color:var(--border-danger)}
 .sc-err{font-size:12px;color:var(--text-danger);margin-top:4px}.sc-err:empty{display:none}
 .sc-prev{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);white-space:pre-wrap;padding:6px 8px;background:var(--surface-1);border-radius:5px}
-.sc-rk{display:flex;align-items:center;gap:4px;padding:2px 0;border-top:0.5px solid var(--border)}.sc-rk:first-of-type{border-top:0}.sc-rk>em{width:18px;font-style:normal;font-family:var(--font-mono);color:var(--c)}.sc-rk>span{flex:1}.sc-rk button{width:26px;height:26px;padding:0}.sc-rk.off>span{color:var(--text-muted);text-decoration:line-through}
+.sc-rk{display:flex;align-items:center;gap:4px;padding:2px 0;border-top:0.5px solid var(--border)}.sc-rk:first-of-type{border-top:0}.sc-rk>em{width:18px;font-style:normal;font-family:var(--font-mono);color:var(--c)}.sc-rk>span{flex:1}.sc-rk button{width:26px;height:26px;padding:0;border:0;color:var(--text-muted)}.sc-rk button:hover{color:var(--text-primary)}.sc-rk.off>span{color:var(--text-muted);text-decoration:line-through}
 @media (max-width:520px){
 .sc{padding:10px 12px}.sc-hm{margin-left:0;flex-basis:100%}.sc-body,.sc-ab{padding-left:0}
 .sc-proof>div{grid-template-columns:64px minmax(0,1fr)}.sc-diff>div{grid-template-columns:minmax(0,1fr) auto}.sc-db{display:none}.sc-env em{margin-left:0}
-.sc button{min-height:34px}.sc-rk button{width:34px;height:34px}.sc-seg label{padding:7px 10px}.sc-row>.sc-tx{min-width:100%}
+.sc button{min-height:34px}.sc-rk button{width:34px;height:34px}.sc-seg label{padding:7px 10px}.sc-row>.sc-tx{min-width:0;flex:1}.sc-row>button,.sc-row>.sc-seg{flex-basis:100%}.sc-row>.sc-seg{display:flex}.sc-row>.sc-seg label{flex:1;text-align:center}
 }
 `;
 
@@ -78,7 +78,7 @@
   function cost(it) {
     if (!it || (!it.cost && !it.effort)) return '';
     const e = +it.effort || 0;
-    const dots = e ? `<i class="sc-e">${[1, 2, 3].map((n) => `<s${n <= e ? ' class="on"' : ''}></s>`).join('')}</i>` : '';
+    const dots = e ? `<i class="sc-e" title="effort ${e} of 3" aria-label="effort ${e} of 3">${[1, 2, 3].map((n) => `<s${n <= e ? ' class="on"' : ''}></s>`).join('')}</i>` : '';
     return `<span class="sc-cost">${it.cost ? icon('clock') + esc(it.cost) : ''}${dots}</span>`;
   }
 
@@ -99,15 +99,56 @@
   const button = (b, cls = '') => {
     if (typeof b === 'string') b = { label: b, send: b };
     if (b.copy) return `<button type="button" data-copy="${esc(b.copy)}">${esc(b.label || 'Copy')}</button>`;
-    return `<button type="button" class="${b.primary ? 'sc-pri next ' : ''}${cls}" data-p="${esc(b.send || b.label)}">${esc(b.label)} ↗</button>`;
+    return `<button type="button" class="${b.primary ? 'sc-pri you ' : ''}${cls}" data-p="${esc(b.send || b.label)}" title="Puts this in your message box">${esc(b.label)}</button>`;
   };
+
+  // The banner's colour follows the rules, whatever state was asked for: anything waiting on the
+  // user makes it their turn, and "done" never shows while something is still open.
+  const YOU_BLOCKS = ['decide', 'ask', 'reply', 'approve', 'rank', 'park', 'step', 'cmd'];
+  function derive(blocks, given) {
+    let you = false, stop = false, next = false, open = false;
+    for (const b of blocks) {
+      if (!b) continue;
+      if (YOU_BLOCKS.includes(b.type)) you = true;
+      if (b.type === 'lanes') for (const l of arr(b.lanes)) {
+        if (!arr(l.items).length) continue;
+        if (l.state === 'you') you = true; else if (l.state === 'stop') stop = true; else if (l.state === 'next') next = true; else if (l.state === 'idle') open = true;
+      }
+      if (b.type === 'rows') for (const r of arr(b.rows)) { if (r.state === 'you') you = true; if (r.state === 'stop') stop = true; if (r.state === 'next') next = true; }
+    }
+    if (you) return 'you';
+    if (given === 'done' && (stop || next || open)) return stop ? 'stop' : 'next';
+    return given;
+  }
+  // One word per state; a custom title is kept, but after the state word and quieter.
+  const WORDS = { you: ['Your turn'], stop: ['Blocked'], next: ["Claude's on it"], done: ['All done', 'Answered'], idle: ['Paused'] };
+  function stateWord(s, title) {
+    if (title && WORDS[s].includes(title)) return `<span class="sc-st">${esc(title)}</span>`;
+    return `<span class="sc-st">${WORDS[s][0]}</span>${title ? `<span class="sc-st2">· ${md(title)}</span>` : ''}`;
+  }
+  // The right-hand load always answers "what's on me?".
+  function load(blocks) {
+    let n = 0, mins = 0, unknown = false;
+    const add = (it) => { n += 1; const m = parseInt(it && it.cost, 10); if (m) mins += m; else unknown = true; };
+    for (const b of blocks) {
+      if (!b) continue;
+      if (b.type === 'lanes') for (const l of arr(b.lanes)) if (l.state === 'you') arr(l.items).forEach((it) => add(typeof it === 'string' ? {} : it));
+      if (b.type === 'rows') arr(b.rows).filter((r) => r.state === 'you').forEach(add);
+      if (b.type === 'ask' || b.type === 'park') arr(b.questions || b.items).forEach(add);
+      if (['decide', 'reply', 'approve', 'rank', 'step', 'cmd'].includes(b.type)) add(b);
+    }
+    // A primary button with nothing else on the user means "say go": that is their one thing.
+    if (!n && blocks.some((b) => b && b.type === 'actions' && arr(b.buttons).some((x) => x && x.primary))) return '1 thing · say go';
+    if (!n) return 'Nothing needs you';
+    return `${n} thing${n > 1 ? 's' : ''}${mins ? ` · about ${mins}${unknown ? '+' : ''} min` : ''}`;
+  }
 
   // Question blocks register here; the footer collects them into one message.
   function renderBlocks(spec, ctx) {
     const B = {
       banner(b) {
-        const s = st(b.state, 'you');
-        return `<div class="sc-hd ${s}"><span class="sc-dot"></span><span class="sc-st">${md(b.title || BANNER[s][1])}</span>${b.sub ? `<span class="sc-hm">${md(b.sub)}</span>` : ''}</div>`;
+        const s = derive(arr(spec.blocks), st(b.state, 'you'));
+        return `<div class="sc-hd ${s}"><span class="sc-dot"></span>${stateWord(s, b.title)}<span class="sc-hm">${md(b.sub || load(arr(spec.blocks)))}</span></div>`;
       },
       back(b) {
         const row = (k, v, cls = '') => (v ? `<div class="sc-bl ${cls}"><span>${k}</span>${cls ? `<b>${md(v)}</b>` : md(v)}</div>` : '');
@@ -134,7 +175,7 @@
             sums.push(`<details class="done"><summary><span class="sc-k">✓ ${list.length} done</span> · ${md(l.foldSummary || gist)}<span class="sc-sh"></span></summary><ul>${list.map((it) => `<li>${md(txt(it))}</li>`).join('')}</ul></details>`);
           } else {
             const label = l.title || (s === 'next' ? 'Then Claude' : 'Waiting');
-            sums.push(`<div class="${s}"><span class="sc-k">${s === 'next' ? '↳' : '·'} ${md(label)}:</span> ${md(list.map(txt).join(', '))}</div>`);
+            sums.push(`<div class="${s}"><span class="sc-k">${s === 'next' ? '↳' : '·'} ${md(label)}:</span> ${md(list.map(txt).join(s === 'next' ? '; then ' : ', '))}</div>`);
           }
         }
         return lines.join('') + (sums.length ? `<div class="sc-sums">${sums.join('')}</div>` : '');
@@ -145,9 +186,11 @@
         let body = checks.map((c, i) => `<label class="sc-ck"><input type="checkbox" value="${esc(c.value || c.text || c)}" data-i="${i}">${md(c.text || c)}</label>`).join('');
         let open = `<div class="sc-step ${s}">`;
         if (b.report) {
-          const id = ctx.q({ kind: 'ticks', label: b.q || b.title });
+          // Each check starts unset: nothing is reported as working or broken until the user says so.
+          const id = ctx.q({ kind: 'ticks', label: b.q || b.title, req: true });
           open = `<div class="sc-step sc-form ${s}" data-qid="${id}">`;
-          body += `<textarea class="sc-in" rows="2" placeholder="${esc(b.placeholder || 'What went wrong (if anything)')}"></textarea>`;
+          body = checks.map((c, i) => `<div class="sc-ckr" data-v="${esc(c.value || c.text || c)}"><span>${md(c.text || c)}</span><span class="sc-seg" role="radiogroup" aria-label="${esc(c.text || c)}"><label class="done"><input type="radio" name="${id}c${i}" value="works">Works</label><label class="stop"><input type="radio" name="${id}c${i}" value="broken">Broken</label><label class="idle"><input type="radio" name="${id}c${i}" value="not tried">Didn't try</label></span></div>`).join('');
+          body += `<textarea class="sc-in" rows="2" placeholder="${esc(b.placeholder || 'What went wrong (if anything)')}"></textarea><div class="sc-err"></div>`;
         }
         return `${open}<span class="sc-pill">${esc(b.label || 'Your one next step')}</span>${cost(b)}<div class="sc-big">${md(b.title)}</div>${body}</div>`;
       },
@@ -182,11 +225,11 @@
         const out = [];
         if (b.branch) out.push(k('idle', 'git-branch', `<code style="color:var(--text-primary)">${esc(b.branch)}</code>`));
         if (b.worktree) out.push(k('idle', 'folders', esc(b.worktree)));
-        if (b.ahead) out.push(k('done', 'arrow-up', `${esc(b.ahead)} ahead`));
+        if (b.ahead) out.push(k('idle', 'arrow-up', `${esc(b.ahead)} ahead`));
         if (b.behind) out.push(k('you', 'arrow-down', `${esc(b.behind)} behind ${esc(b.base || 'main')}`));
         if (b.dirty) out.push(k(st(b.dirtyState, 'you'), 'pencil', `${esc(b.dirty)} uncommitted`));
-        else if (b.dirty === 0) out.push(k('done', 'check', 'Clean'));
-        if (b.merged === true) out.push(k('done', 'git-merge', 'Merged'));
+        else if (b.dirty === 0) out.push(k('idle', 'check', 'Clean'));
+        if (b.merged === true) out.push(k('idle', 'git-merge', 'Merged'));
         if (b.merged === false) out.push(k('idle', 'git-merge', 'Not merged'));
         return `<div><div class="sc-chips" style="gap:6px">${out.join('')}</div>${b.asOf ? `<div class="sc-meta" style="margin-top:6px">${md(b.asOf)}</div>` : ''}</div>`;
       },
@@ -224,7 +267,7 @@
         const id = ctx.q({ kind: 'radio', label: b.q || b.title, req: b.required !== false, other: !!b.other });
         const opts = arr(b.options).map((o) => {
           if (typeof o === 'string') o = { label: o };
-          return `<label class="sc-opt"><input type="radio" name="${id}" value="${esc(o.value || o.label)}"${o.rec ? ' data-rec checked' : ''}><span><b>${md(o.label)}</b>${o.rec ? ' <span class="sc-pill next">Recommended</span>' : ''}${o.why ? `<br>${md(o.why)}` : ''}</span></label>`;
+          return `<label class="sc-opt"><input type="radio" name="${id}" value="${esc(o.value || o.label)}"${o.rec ? ' data-rec checked' : ''}><span><b>${md(o.label)}</b>${o.rec ? ' <span class="sc-pill you">Recommended</span>' : ''}${o.why ? `<br>${md(o.why)}` : ''}</span></label>`;
         }).join('');
         return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'arrows-split')}${md(b.title)}</div>${opts}${b.other ? `<input class="sc-in" placeholder="${esc(b.otherPlaceholder || 'Anything to add (optional)')}">` : ''}<div class="sc-err"></div></div>`;
       },
@@ -241,18 +284,18 @@
         }).join('')}</div>`;
       },
       reply(b) {
-        const id = ctx.q({ kind: 'text', label: b.q || b.title, min: b.min || 0, msg: b.minMessage });
-        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'message')}${md(b.title)}</div><textarea class="sc-in" rows="${b.rows || 3}" placeholder="${esc(b.placeholder || '')}"></textarea><div class="sc-err"></div><div class="sc-meta" style="margin-top:6px">Cmd+Enter sends</div></div>`;
+        const id = ctx.q({ kind: 'text', label: b.q || b.title, min: b.min || 0, msg: b.minMessage, req: !!(b.required || b.min) });
+        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'message')}${md(b.title)}</div><textarea class="sc-in" rows="${b.rows || 3}" placeholder="${esc(b.placeholder || '')}" aria-label="${esc(b.title)}"></textarea><div class="sc-err"></div></div>`;
       },
       approve(b) {
-        const id = ctx.q({ kind: 'approve', label: b.q || b.title });
-        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'file-check')}${md(b.title)}</div>${b.text ? `<div class="sc-li" style="margin-bottom:10px">${md(b.text)}</div>` : ''}<span class="sc-seg"><label class="done"><input type="radio" name="${id}" value="approved" data-rec checked>Approve</label><label class="you"><input type="radio" name="${id}" value="approved with a change">With a tweak</label><label class="stop"><input type="radio" name="${id}" value="rejected">No</label></span><div data-when="approved with a change" hidden><input class="sc-in" placeholder="${esc(b.tweakPlaceholder || 'Change…')}"></div><div class="sc-err"></div></div>`;
+        const id = ctx.q({ kind: 'approve', label: b.q || b.title, req: true });
+        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'file-check')}${md(b.title)}</div>${b.text ? `<div class="sc-li" style="margin-bottom:10px">${md(b.text)}</div>` : ''}<span class="sc-seg"><label class="done"><input type="radio" name="${id}" value="approved"${b.preselect ? ' data-rec checked' : ''}>Approve</label><label class="you"><input type="radio" name="${id}" value="approved with a change">With a tweak</label><label class="stop"><input type="radio" name="${id}" value="rejected">No</label></span><div data-when="approved with a change" hidden><input class="sc-in" placeholder="${esc(b.tweakPlaceholder || 'Change…')}"></div><div class="sc-err"></div></div>`;
       },
       rank(b) {
         const id = ctx.q({ kind: 'rank', label: b.q || b.title || 'Order for next steps' });
         return `<div class="sc-box sc-form ${st(b.state, 'next')}" data-qid="${id}"><div class="sc-qt">${icon('list-numbers')}${md(b.title || 'What first?')}</div>${arr(b.items).map((x, i) => {
           if (typeof x === 'string') x = { label: x };
-          return `<div class="sc-rk" data-v="${esc(x.value || x.label)}"><em>${i + 1}</em><span>${md(x.label)}</span><button type="button" data-mv="-1" aria-label="Move up">${icon('chevron-up')}</button><button type="button" data-mv="1" aria-label="Move down">${icon('chevron-down')}</button><button type="button" data-mv="x" aria-label="Drop or restore">${icon('x')}</button></div>`;
+          return `<div class="sc-rk" data-v="${esc(x.value || x.label)}"><em>${i + 1}</em><span>${md(x.label)}</span><button type="button" data-mv="-1" aria-label="Move ${esc(x.label)} up">${icon('chevron-up')}</button><button type="button" data-mv="1" aria-label="Move ${esc(x.label)} down">${icon('chevron-down')}</button><button type="button" data-mv="x" aria-label="Drop or restore ${esc(x.label)}">${icon('x')}</button></div>`;
         }).join('')}</div>`;
       },
       park(b) {
@@ -281,14 +324,16 @@
         return on.join(', ') + (off.length ? `; drop: ${off.join(', ')}` : '');
       }
       if (q.kind === 'ticks') {
-        const c = [...el.querySelectorAll('input[type=checkbox]')];
-        const list = (b) => c.filter((i) => i.checked === b).map((i) => i.value).join(', ') || 'none';
+        const rows = [...el.querySelectorAll('.sc-ckr')].map((r) => [r.dataset.v, r.querySelector('input:checked')?.value]);
+        const group = (k) => rows.filter(([, v]) => v === k).map(([n]) => n);
+        const parts = [['works', group('works')], ['broken', group('broken')], ["didn't try", group('not tried')], ['not marked', rows.filter(([, v]) => !v).map(([n]) => n)]].filter(([, l]) => l.length).map(([k, l]) => `${k}: ${l.join(', ')}`);
+        if (!rows.some(([, v]) => v)) return '';
         const t = textOf(el);
-        return `worked: ${list(true)}; failed or not tried: ${list(false)}${t ? `. ${t}` : ''}`;
+        return parts.join('; ') + (t ? `. ${t}` : '');
       }
       if (q.kind === 'text') return textOf(el);
       const r = el.querySelector('input[type=radio]:checked');
-      let v = r ? r.value + (r.hasAttribute('data-rec') ? ' (your recommendation)' : '') : '';
+      let v = r ? r.value + (r.hasAttribute('data-rec') ? ' (as you suggested)' : '') : '';
       const t = textOf(el);
       if (t) v += (v ? '. ' : '') + t;
       return v;
@@ -296,13 +341,14 @@
     const problem = (q) => {
       const el = qel(q);
       const v = value(q);
-      if (q.req && !v) return 'Pick one first.';
+      if (q.req && !v) return q.kind === 'text' ? 'Write a few words first.' : q.kind === 'ticks' ? 'Mark at least one check.' : 'Pick one first.';
       if (q.kind === 'text' && q.min && v.length < q.min) return q.msg || `A few more words, at least ${q.min} characters.`;
       if (q.kind === 'approve' && el.querySelector('input:checked')?.value === 'approved with a change' && !textOf(el)) return 'Say what to change.';
       return '';
     };
     const send = spec.send || {};
-    const message = () => [send.intro || 'My answers:', ...ctx.qs.map((q) => `- ${q.label}: ${value(q) || 'skipped'}`), send.go].filter(Boolean).join('\n');
+    const goLine = () => root.querySelector('input[data-go]:checked')?.value ?? send.go;
+    const message = () => [send.intro || 'My answers:', ...ctx.qs.map((q) => `- ${q.label}: ${value(q) || 'skipped'}`), goLine()].filter(Boolean).join('\n');
     const prev = root.querySelector('.sc-prev');
     const update = () => {
       ctx.qs.forEach((q) => {
@@ -425,13 +471,17 @@
     const ban = bi >= 0 ? blocks[bi] : null;
     let head = '';
     if (spec.title) {
-      const s = st(ban && ban.state, ban ? 'you' : 'idle');
-      head = `<div class="sc-hd ${s}"><span class="sc-dot"></span>${ban ? `<span class="sc-st">${md(ban.title || BANNER[s][1])}</span>` : ''}<span class="sc-tt">${md(spec.title)}</span>${spec.project ? `<span class="sc-proj">${esc(spec.project)}</span>` : ''}${ban && ban.sub ? `<span class="sc-hm">${md(ban.sub)}</span>` : ''}</div>${spec.about ? `<div class="sc-ab">${md(spec.about)}</div>` : ''}`;
+      const s = ban ? derive(blocks, st(ban.state, 'you')) : 'idle';
+      head = `<div class="sc-hd ${s}"><span class="sc-dot"></span>${ban ? stateWord(s, ban.title) : ''}<span class="sc-tt">${md(spec.title)}</span>${spec.project ? `<span class="sc-proj">${esc(spec.project)}</span>` : ''}${ban ? `<span class="sc-hm">${md(ban.sub || load(blocks))}</span>` : ''}</div>${spec.about ? `<div class="sc-ab">${md(spec.about)}</div>` : ''}`;
     }
     let body = renderBlocks(head && ban ? { ...spec, blocks: blocks.filter((_, i) => i !== bi) } : spec, ctx);
     if (ctx.qs.length) {
       const send = spec.send || {};
-      body += `<div class="sc-act"><button type="button" class="sc-go done" data-send>${esc(send.label || 'Send answers')} ↗</button><button type="button" data-reset>Reset to defaults</button>${arr(send.buttons).map((x) => button(x)).join('')}</div><div class="sc-prev" aria-live="polite"></div>`;
+      const goName = `sc${uid}go`;
+      const goChoice = send.go && send.alt
+        ? `<div class="sc-goline">Then: <span class="sc-seg"><label class="you"><input type="radio" name="${goName}" data-go value="${esc(send.go)}" checked>${esc(send.go)}</label><label class="idle"><input type="radio" name="${goName}" data-go value="${esc(send.alt)}">${esc(send.alt)}</label></span></div>`
+        : send.go ? `<div class="sc-goline">Ends with “${md(send.go)}”</div>` : '';
+      body += `${goChoice}<div class="sc-act"><button type="button" class="sc-go you" data-send title="Puts your answers in your message box; press Enter to send">${esc(send.label || 'Put in my reply')}</button><button type="button" class="sc-link" data-reset>Reset to defaults</button>${arr(send.buttons).map((x) => button(x)).join('')}</div><details class="sc-pv"><summary>Message preview<span class="sc-sh"></span></summary><div class="sc-prev" aria-live="polite"></div></details>`;
     }
     const html = head ? head + (body ? `<div class="sc-body">${body}</div>` : '') : body;
     root.classList.add('sc');

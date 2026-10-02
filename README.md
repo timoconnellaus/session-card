@@ -75,9 +75,9 @@ What changed, how we know it works (observed, tested, inferred or unchecked), an
 
 ### Questions
 
-A decision with Claude's recommendation already selected, a batch of yes/no/later questions, and approve-with-a-tweak. Everything goes into one reply, with a preview of exactly what will be sent. **Reset to defaults** puts back Claude's picks.
+A decision with Claude's recommendation already selected, a batch of yes/no/later questions, and approve-with-a-tweak. **Put in my reply** gathers every answer into one message in your message box (a folded preview shows the exact text), and the card shows how the reply ends, for example "Go ahead" or "Plan only". **Reset to defaults** puts back Claude's picks. Nothing you have to observe yourself, like test results, is ever pre-filled.
 
-<p align="center"><img src="docs/images/questions.png" width="600" alt="A decision with a recommended option, yes/no/later rows, an approve control, a green Send answers button and a message preview"></p>
+<p align="center"><img src="docs/images/questions.png" width="600" alt="A decision with a recommended option, yes/no/later rows, an approve control, a violet Put in my reply button and a folded message preview"></p>
 
 ### Test results and priorities
 
@@ -99,6 +99,7 @@ The skill has firm rules against overclaiming:
 - "Not run" and "stale" are shown, never left out.
 - Red is only for something seen failing.
 - "Builds" never stands in for "tests pass", and "deployed" never stands in for "installed".
+- "Claude's on it" only shows when something is really running (a deploy, CI). When Claude has stopped and needs your go, the card says it's your turn.
 - "All done" needs a clean slate.
 
 ## Settings
@@ -122,7 +123,7 @@ To draw a card, Claude writes a short JSON spec and passes it to the `show_widge
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v2.0.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v2.2.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
