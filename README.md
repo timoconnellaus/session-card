@@ -3,7 +3,7 @@
 End-of-turn status cards for Claude Code. When a turn leaves something for you to do, Claude draws a small colour-coded card in the chat: what's done, what you need to try or decide, what Claude will do next, and what's blocked. Built for people who find long chat scrollback hard to scan (ADHD-friendly by design).
 
 - **Composed, not templated.** Claude picks blocks from a kit (banner, lanes, one next step, progress track, scoreboard, git and PR state, test evidence, deploys, diff, risk and rollback, and more) to fit the moment, A2UI style.
-- **Answer from the card.** Decisions with a recommended option, batches of yes/no questions, approve-with-a-tweak, reordering next steps, parking open threads and device-test checklists. Everything on the card is sent back as one message.
+- **Answer from the card.** Decisions with a recommended option, batches of yes/no questions, approve-with-a-tweak, reordering next steps, parking open threads and device-test checklists. Your answers are added to your message box as one message, and you press Enter to send.
 - **Honest.** The skill's rules stop Claude marking things green without evidence from the session, and show "not run" and "stale" as states of their own.
 - **Every turn.** Each turn ends with a card that says whether the work is finished and repeats anything still waiting on you, since earlier cards scroll away. A stop hook nudges Claude once if a turn ends without one.
 - Follows light and dark mode, and works on phone widths.
@@ -23,7 +23,7 @@ Claude writes a short JSON spec and calls `show_widget` with:
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.5.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 

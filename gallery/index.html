@@ -25,7 +25,7 @@ button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:0.5
 <script src="../renderer.js"></script>
 <script src="examples.js"></script>
 <script>
-window.sendPrompt = (t) => { const s = document.getElementById('sent'); s.textContent = 'sendPrompt →\n' + t; s.style.display = 'block'; };
+window.sendPrompt = (t) => { const s = document.getElementById('sent'); s.textContent += t; s.style.display = 'block'; }; // like the app: adds to the message box
 const p = new URLSearchParams(location.search);
 if (p.get('mode') === 'dark') document.documentElement.dataset.mode = 'dark';
 if (p.get('w') === 'phone') document.body.classList.add('phone');

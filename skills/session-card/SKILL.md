@@ -24,7 +24,7 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.5.0/renderer.js" integrity="sha384-SsYEZaJVDwrI6XeH87xMlXkefdV0EeWM6NnRIWZ2ifoIvij3BV1riEWXzE6qoyAm" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.0/renderer.js" integrity="sha384-eYM2phckUvjtV0aCxSrYnWowNmqQVzHkSzfiZKrKF1gAI7gLVxtL4LiqXrqAhAfq" crossorigin="anonymous"></script>
 <script>
 const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
@@ -116,7 +116,7 @@ Every block is `{"type": ..., ...}`. Items in lists are a string or `{"text", "l
 - `step` with `report: true, q`: a device-test checklist whose ticks are reported back.
 - `actions` `{buttons: [{label, send, primary?}]}`: one-tap messages. `{label, copy}` copies instead.
 
-`q` is the question's label in the sent message, so name the real thing ("UI prefix on planning page"), never "Q2". Values carry the ids the next step needs. Set `spec.send = {intro, go, label?}`: `intro` names the topic ("Answers about the voice feature:"), `go` is a clear go or no-go ("Go ahead.", "Plan only, don't start yet."). The message marks taken recommendations "(your recommendation)" and unanswered ones "skipped". Button `send` text is in the user's voice and makes sense without the card: "Tested the mic on the phone, it works. Ship it." Never ask for secrets on a card: show a `cmd` they run themselves plus a "Done, it's set" button.
+`q` is the question's label in the sent message, so name the real thing ("UI prefix on planning page"), never "Q2". Values carry the ids the next step needs. Set `spec.send = {intro, go, label?}`: `intro` names the topic ("Answers about the voice feature:"), `go` is a clear go or no-go ("Go ahead.", "Plan only, don't start yet."). The message marks taken recommendations "(your recommendation)" and unanswered ones "skipped". Buttons put their text into the user's message box (each on its own line) and the user presses Enter to send, so a button can be pressed again or combined with others. Button `send` text is in the user's voice and makes sense without the card: "Tested the mic on the phone, it works. Ship it." Never ask for secrets on a card: show a `cmd` they run themselves plus a "Done, it's set" button.
 
 ## Shapes that work
 

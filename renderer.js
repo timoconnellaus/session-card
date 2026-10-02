@@ -2,7 +2,7 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '1.5.0';
+  const VERSION = '1.7.0';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:12px;padding:4px 0;font-size:14px;color:var(--text-primary)}
@@ -43,7 +43,6 @@
 .sc-err{font-size:13px;color:var(--text-danger);margin-top:6px}.sc-err:empty{display:none}
 .sc-prev{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);white-space:pre-wrap;padding:8px 12px;background:var(--surface-1);border-radius:8px}
 .sc-rk{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:0.5px solid var(--border)}.sc-rk:first-of-type{border-top:0}.sc-rk>em{width:22px;font-style:normal;font-family:var(--font-mono);color:var(--c)}.sc-rk>span{flex:1}.sc-rk button{width:30px;height:30px;padding:0}.sc-rk.off>span{color:var(--text-muted);text-decoration:line-through}
-.sc-sent .sc-form,.sc-sent .sc-act{opacity:.5;pointer-events:none}
 .sc-top{display:flex;flex-direction:column;gap:2px;padding:0 2px 2px}.sc-tt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px;font-weight:500;line-height:1.3}.sc-proj{font-size:11px;font-weight:500;font-family:var(--font-mono);color:var(--text-secondary);background:var(--surface-1);border:0.5px solid var(--border);border-radius:6px;padding:1px 7px}.sc-ab{font-size:13px;line-height:1.45;color:var(--text-secondary)}
 @media (max-width:520px){
 .sc-ban{flex-wrap:wrap;gap:12px;padding:14px}.sc-ic{width:36px;height:36px;font-size:20px}.sc-ban>div:nth-child(2){flex:1;min-width:0}.sc-t{font-size:19px}.sc-bar{margin-left:0;flex-basis:100%}.sc-bar span{flex:1;max-width:28px}
@@ -293,10 +292,16 @@
       });
       if (prev) prev.textContent = message();
     };
-    const go = (text) => {
-      if (typeof sendPrompt === 'function') sendPrompt(text);
+    // sendPrompt adds the text to the user's message box; they press Enter. Buttons stay live so
+    // they can be pressed again, and each message ends with a line break so two don't run together.
+    const go = (text, btn) => {
+      if (typeof sendPrompt === 'function') sendPrompt(text + '\n');
       else console.log('[session-card] sendPrompt:', text);
-      root.classList.add('sc-sent');
+      if (btn && !btn.dataset.label) {
+        btn.dataset.label = btn.innerHTML;
+        btn.innerHTML = `${icon('check')}Added`;
+        setTimeout(() => { btn.innerHTML = btn.dataset.label; delete btn.dataset.label; }, 1500);
+      }
     };
     const submit = (btn) => {
       let first = null;
@@ -308,8 +313,7 @@
         if (p && !first) first = el;
       });
       if (first) return first.querySelector('input,textarea')?.focus();
-      go(message());
-      btn.innerHTML = `${icon('check')}Sent`;
+      go(message(), btn);
     };
     root.addEventListener('change', update);
     root.addEventListener('input', (e) => {
@@ -320,7 +324,7 @@
     });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('button');
-      if (!t || root.classList.contains('sc-sent') && !t.dataset.copy) return;
+      if (!t) return;
       if (t.dataset.mv) {
         const row = t.closest('.sc-rk');
         const d = t.dataset.mv;
@@ -336,7 +340,7 @@
       } else if (t.hasAttribute('data-send')) {
         submit(t);
       } else if (t.dataset.p) {
-        go(t.dataset.p);
+        go(t.dataset.p, t);
       }
     });
     root.addEventListener('keydown', (e) => {
@@ -357,7 +361,6 @@
       root = fresh;
     }
     root.dataset.scWired = '1';
-    root.classList.remove('sc-sent');
     if (!document.getElementById('sc-css')) {
       const s = document.createElement('style');
       s.id = 'sc-css';
