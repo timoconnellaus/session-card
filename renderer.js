@@ -1,8 +1,8 @@
 /* session-card renderer: turns a JSON spec into an end-of-turn status card.
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
-   Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
+   Tabler outline icons (`ti ti-*`). It only informs: no buttons or inputs; the user answers in chat. */
 (function () {
-  const VERSION = '2.2.0';
+  const VERSION = '3.0.0';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:10px;box-sizing:border-box;background:var(--surface-2);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.4;color:var(--text-primary);--sc-you:#7C3AED;--sc-you-b:#F3E8FF;--sc-you-l:#C084FC;--sc-done:#15803D;--sc-done-b:#DCFCE7;--sc-done-l:#4ADE80;--sc-next:#0E7490;--sc-next-b:#CFFAFE;--sc-next-l:#22D3EE;--sc-stop:#BE123C;--sc-stop-b:#FFE4E6;--sc-stop-l:#FB7185}
@@ -42,7 +42,7 @@
 .sc-proof{display:flex;flex-direction:column;gap:5px;font-size:12px}.sc-proof>div{display:grid;grid-template-columns:70px minmax(0,1fr);column-gap:8px}.sc-proof .sc-meta{grid-column:2}.sc-proof .sc-tag{width:auto;align-self:start}
 .sc-env{display:flex;flex-direction:column;gap:3px}.sc-env>div{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:11px;color:var(--text-secondary)}.sc-env>div::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);flex-shrink:0}.sc-env b{font-size:13px;color:var(--text-primary)}.sc-env code{color:var(--text-primary)}.sc-env em{font-style:normal;color:var(--c);margin-left:auto}
 .sc-diff{display:flex;flex-direction:column;gap:3px;font-size:12px}.sc-diff>div{display:grid;grid-template-columns:minmax(0,1fr) auto 50px;gap:8px;align-items:center}.sc-diff code{color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sc-pm{font-family:var(--font-mono);font-size:11px}.sc-pm ins{text-decoration:none;color:var(--sc-done);margin-right:5px}.sc-pm del{text-decoration:none;color:var(--sc-stop)}.sc-db{display:flex;height:4px;border-radius:2px;overflow:hidden;background:var(--surface-1)}.sc-db i{background:var(--sc-done)}.sc-db s{background:var(--sc-stop)}
-.sc-qt{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;margin-bottom:6px}
+.sc-qt{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:500;margin-bottom:6px}.sc-q{border:0.5px solid var(--l);border-radius:5px;padding:8px 10px}.sc-qn{flex-shrink:0;min-width:18px;height:18px;border-radius:4px;background:var(--b);color:var(--c);font-size:11px;font-family:var(--font-mono);display:inline-flex;align-items:center;justify-content:center}.sc-op{display:flex;gap:8px;padding:4px 0 4px 2px;color:var(--text-secondary)}.sc-op b{color:var(--text-primary)}.sc-ol{flex-shrink:0;width:16px;font-family:var(--font-mono);color:var(--c)}.sc-ow{display:block;font-size:12px;color:var(--text-muted)}.sc-ow2{font-size:12px;color:var(--text-muted)}.sc-ql{display:flex;gap:8px;padding:3px 0}.sc-hint{font-size:12px;color:var(--text-muted);margin-top:6px}.sc-box2{width:12px;height:12px;border:1px solid var(--border-strong);border-radius:3px;flex-shrink:0}
 .sc-opt{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;margin-top:4px;border:0.5px solid var(--border);border-radius:5px;color:var(--text-secondary);cursor:pointer}.sc-opt input{margin-top:2px;accent-color:var(--sc-you)}.sc-opt b{color:var(--text-primary)}.sc-opt:has(input:checked){border-color:var(--l);background:var(--b)}
 .sc-seg{display:inline-flex;flex-shrink:0;border:0.5px solid var(--border-strong);border-radius:5px;overflow:hidden}.sc-seg label{padding:3px 9px;font-size:12px;cursor:pointer;color:var(--text-secondary)}.sc-seg label+label{border-left:0.5px solid var(--border-strong)}.sc-seg input{position:absolute;opacity:0;pointer-events:none}.sc-seg label:has(input:checked){background:var(--b);color:var(--c);box-shadow:inset 0 0 0 1px var(--l);font-weight:500}.sc-seg label:has(input:focus-visible){outline:2px solid var(--l)}
 .sc-in{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;font-size:13px;padding:5px 8px;border-radius:5px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);resize:vertical}.sc-in[aria-invalid=true]{border-color:var(--border-danger)}
@@ -96,11 +96,8 @@
     return shown + `<details class="sc-fold"><summary>${esc(summary || `${rest.length} more`)}<span class="sc-sh"></span></summary>${rest.map((it, i) => item(it, numbered ? max + i + 1 : undefined)).join('')}</details>`;
   }
 
-  const button = (b, cls = '') => {
-    if (typeof b === 'string') b = { label: b, send: b };
-    if (b.copy) return `<button type="button" data-copy="${esc(b.copy)}">${esc(b.label || 'Copy')}</button>`;
-    return `<button type="button" class="${b.primary ? 'sc-pri you ' : ''}${cls}" data-p="${esc(b.send || b.label)}" title="Puts this in your message box">${esc(b.label)}</button>`;
-  };
+  // Cards only inform: buttons and inputs are gone, the user answers in chat.
+  const button = () => '';
 
   // The banner's colour follows the rules, whatever state was asked for: anything waiting on the
   // user makes it their turn, and "done" never shows while something is still open.
@@ -143,7 +140,10 @@
     return `${n} thing${n > 1 ? 's' : ''}${mins ? ` · about ${mins}${unknown ? '+' : ''} min` : ''}`;
   }
 
-  // Question blocks register here; the footer collects them into one message.
+  // Questions are numbered across the card so the user can answer "1a, 2 yes" in chat.
+  const qnum = (ctx, bump) => { if (bump) ctx.n = (ctx.n || 0) + 1; return bump ? String(ctx.n) : ''; };
+
+  // Blocks render read-only; questions are numbered so the user can answer in chat.
   function renderBlocks(spec, ctx) {
     const B = {
       banner(b) {
@@ -182,17 +182,9 @@
       },
       step(b) {
         const s = st(b.state, 'you');
-        const checks = arr(b.checks);
-        let body = checks.map((c, i) => `<label class="sc-ck"><input type="checkbox" value="${esc(c.value || c.text || c)}" data-i="${i}">${md(c.text || c)}</label>`).join('');
-        let open = `<div class="sc-step ${s}">`;
-        if (b.report) {
-          // Each check starts unset: nothing is reported as working or broken until the user says so.
-          const id = ctx.q({ kind: 'ticks', label: b.q || b.title, req: true });
-          open = `<div class="sc-step sc-form ${s}" data-qid="${id}">`;
-          body = checks.map((c, i) => `<div class="sc-ckr" data-v="${esc(c.value || c.text || c)}"><span>${md(c.text || c)}</span><span class="sc-seg" role="radiogroup" aria-label="${esc(c.text || c)}"><label class="done"><input type="radio" name="${id}c${i}" value="works">Works</label><label class="stop"><input type="radio" name="${id}c${i}" value="broken">Broken</label><label class="idle"><input type="radio" name="${id}c${i}" value="not tried">Didn't try</label></span></div>`).join('');
-          body += `<textarea class="sc-in" rows="2" placeholder="${esc(b.placeholder || 'What went wrong (if anything)')}"></textarea><div class="sc-err"></div>`;
-        }
-        return `${open}<span class="sc-pill">${esc(b.label || 'Your one next step')}</span>${cost(b)}<div class="sc-big">${md(b.title)}</div>${body}</div>`;
+        const checks = arr(b.checks).map((c) => `<div class="sc-ck"><span class="sc-box2" aria-hidden="true"></span>${md(c.text || c)}</div>`).join('');
+        const ask = b.report ? `<div class="sc-hint">${qnum(ctx)}Reply with what worked, what broke and what you didn't try.</div>` : '';
+        return `<div class="sc-step ${s}"><span class="sc-pill">${esc(b.label || 'Your one next step')}</span>${cost(b)}<div class="sc-big">${md(b.title)}</div>${checks}${ask}</div>`;
       },
       track(b) {
         return `<div class="sc-trk">${arr(b.stages).map((x) => {
@@ -213,7 +205,7 @@
       },
       note: (b) => `<div class="sc-note ${st(b.state, 'stop')}">${icon(b.icon || (b.state === 'next' ? 'info-circle' : 'alert-triangle'))}<span>${md(b.text)}</span></div>`,
       later: (b) => `<div class="sc-later"><div>${md(b.title || 'Ideas for later, no rush')}</div>${b.text ? md(b.text) : items(b.items, { max: 5 })}</div>`,
-      cmd: (b) => `<div class="sc-cmd"><code>${esc(b.cmd)}</code><button type="button" data-copy="${esc(b.cmd)}">Copy</button></div>`,
+      cmd: (b) => `<div class="sc-cmd"><code>${esc(b.cmd)}</code></div>`,
       chips: (b) => `<div class="sc-chips">${arr(b.chips).map((c) => `<span class="sc-pill ${st(c.state)}">${md(c.text)}</span>`).join('')}</div>`,
       meta: (b) => `<div class="sc-meta">${md(b.text)}</div>`,
       win: (b) => `<div class="sc-win ${st(b.state, 'done')}">${icon('trending-up')}<span>${md(b.text)}</span>${b.meta ? `<span class="sc-meta">${md(b.meta)}</span>` : ''}</div>`,
@@ -259,192 +251,46 @@
       },
       risk(b) {
         const s = st(b.state, b.irreversible ? 'stop' : 'you');
-        return `<div class="sc-box ${s}" style="border-color:var(--l)"><div class="sc-h">${icon('shield-exclamation')}${md(b.title || 'Risk and rollback')}${b.irreversible ? '<span class="sc-pill" style="margin-left:auto">Irreversible</span>' : ''}</div>${items(b.items, { max: 6 })}${b.rollback ? `<div class="sc-cmd" style="margin-top:10px"><code>${esc(b.rollback)}</code><button type="button" data-copy="${esc(b.rollback)}">Copy</button></div>` : ''}</div>`;
+        return `<div class="sc-box ${s}" style="border-color:var(--l)"><div class="sc-h">${icon('shield-exclamation')}${md(b.title || 'Risk and rollback')}${b.irreversible ? '<span class="sc-pill" style="margin-left:auto">Irreversible</span>' : ''}</div>${items(b.items, { max: 6 })}${b.rollback ? `<div class="sc-cmd" style="margin-top:10px"><code>${esc(b.rollback)}</code></div>` : ''}</div>`;
       },
-      actions: (b) => `<div class="sc-act">${arr(b.buttons).map((x) => button(x)).join('')}</div>`,
+      actions: () => '',
 
       decide(b) {
-        const id = ctx.q({ kind: 'radio', label: b.q || b.title, req: b.required !== false, other: !!b.other });
-        const opts = arr(b.options).map((o) => {
+        const n = qnum(ctx, true);
+        const opts = arr(b.options).map((o, i) => {
           if (typeof o === 'string') o = { label: o };
-          return `<label class="sc-opt"><input type="radio" name="${id}" value="${esc(o.value || o.label)}"${o.rec ? ' data-rec checked' : ''}><span><b>${md(o.label)}</b>${o.rec ? ' <span class="sc-pill you">Recommended</span>' : ''}${o.why ? `<br>${md(o.why)}` : ''}</span></label>`;
+          const L = String.fromCharCode(97 + i);
+          return `<div class="sc-op${o.rec ? ' sc-rec' : ''}"><span class="sc-ol">${L}</span><span><b>${md(o.label)}</b>${o.rec ? ' <span class="sc-pill you">Recommended</span>' : ''}${o.why ? `<span class="sc-ow">${md(o.why)}</span>` : ''}</span></div>`;
         }).join('');
-        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'arrows-split')}${md(b.title)}</div>${opts}${b.other ? `<input class="sc-in" placeholder="${esc(b.otherPlaceholder || 'Anything to add (optional)')}">` : ''}<div class="sc-err"></div></div>`;
+        const rec = arr(b.options).findIndex((o) => o && o.rec);
+        return `<div class="sc-q you"><div class="sc-qt"><span class="sc-qn">${n}</span>${md(b.title)}</div>${opts}<div class="sc-hint">Reply “${n}${rec >= 0 ? String.fromCharCode(97 + rec) : 'a'}”${b.other ? ', or say what you want instead' : ''}.</div></div>`;
       },
       ask(b) {
-        const choices = arr(b.choices).length ? b.choices : ['Yes', 'No', 'Later'];
-        const cls = arr(b.classes).length ? b.classes : ['done', 'stop', 'idle', 'next'];
-        return `<div class="sc-rows sc-form">${arr(b.questions).map((q) => {
-          const id = ctx.q({ kind: 'radio', label: q.q || q.text, req: !!q.required });
-          const seg = choices.map((c, i) => {
-            const rec = q.rec && String(q.rec).toLowerCase() === String(c).toLowerCase();
-            return `<label class="${cls[i % 4]}"><input type="radio" name="${id}" value="${esc(String(c).toLowerCase())}"${rec ? ' data-rec checked' : ''}>${esc(c)}</label>`;
-          }).join('');
-          return `<div class="sc-row ${st(q.state, 'you')}" data-qid="${id}"><span class="sc-tx">${md(q.text)}${cost(q)}</span><span class="sc-seg">${seg}</span><div class="sc-err" style="flex-basis:100%"></div></div>`;
-        }).join('')}</div>`;
+        return `<div class="sc-q you">${arr(b.questions).map((q) => {
+          const n = qnum(ctx, true);
+          return `<div class="sc-ql"><span class="sc-qn">${n}</span><span>${md(q.text)}${q.rec ? ` <span class="sc-ow2">suggested: ${esc(q.rec)}</span>` : ''}</span></div>`;
+        }).join('')}<div class="sc-hint">Reply with ${arr(b.choices).length ? esc(b.choices.join(' / ').toLowerCase()) : 'yes / no / later'} for each, or just “ok” to take the suggestions.</div></div>`;
       },
       reply(b) {
-        const id = ctx.q({ kind: 'text', label: b.q || b.title, min: b.min || 0, msg: b.minMessage, req: !!(b.required || b.min) });
-        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'message')}${md(b.title)}</div><textarea class="sc-in" rows="${b.rows || 3}" placeholder="${esc(b.placeholder || '')}" aria-label="${esc(b.title)}"></textarea><div class="sc-err"></div></div>`;
+        const n = qnum(ctx, true);
+        return `<div class="sc-q you"><div class="sc-qt"><span class="sc-qn">${n}</span>${md(b.title)}</div>${b.placeholder ? `<div class="sc-hint">For example: ${md(b.placeholder)}</div>` : ''}</div>`;
       },
       approve(b) {
-        const id = ctx.q({ kind: 'approve', label: b.q || b.title, req: true });
-        return `<div class="sc-box sc-form ${st(b.state, 'you')} sc-hot" data-qid="${id}"><div class="sc-qt">${icon(b.icon || 'file-check')}${md(b.title)}</div>${b.text ? `<div class="sc-li" style="margin-bottom:10px">${md(b.text)}</div>` : ''}<span class="sc-seg"><label class="done"><input type="radio" name="${id}" value="approved"${b.preselect ? ' data-rec checked' : ''}>Approve</label><label class="you"><input type="radio" name="${id}" value="approved with a change">With a tweak</label><label class="stop"><input type="radio" name="${id}" value="rejected">No</label></span><div data-when="approved with a change" hidden><input class="sc-in" placeholder="${esc(b.tweakPlaceholder || 'Change…')}"></div><div class="sc-err"></div></div>`;
+        const n = qnum(ctx, true);
+        return `<div class="sc-q you"><div class="sc-qt"><span class="sc-qn">${n}</span>${md(b.title)}</div>${b.text ? `<div class="sc-li">${md(b.text)}</div>` : ''}<div class="sc-hint">Reply approve, approve with a change, or no.</div></div>`;
       },
       rank(b) {
-        const id = ctx.q({ kind: 'rank', label: b.q || b.title || 'Order for next steps' });
-        return `<div class="sc-box sc-form ${st(b.state, 'next')}" data-qid="${id}"><div class="sc-qt">${icon('list-numbers')}${md(b.title || 'What first?')}</div>${arr(b.items).map((x, i) => {
-          if (typeof x === 'string') x = { label: x };
-          return `<div class="sc-rk" data-v="${esc(x.value || x.label)}"><em>${i + 1}</em><span>${md(x.label)}</span><button type="button" data-mv="-1" aria-label="Move ${esc(x.label)} up">${icon('chevron-up')}</button><button type="button" data-mv="1" aria-label="Move ${esc(x.label)} down">${icon('chevron-down')}</button><button type="button" data-mv="x" aria-label="Drop or restore ${esc(x.label)}">${icon('x')}</button></div>`;
-        }).join('')}</div>`;
+        const n = qnum(ctx, true);
+        return `<div class="sc-q you"><div class="sc-qt"><span class="sc-qn">${n}</span>${md(b.title || 'What first?')}</div>${arr(b.items).map((x, i) => `<div class="sc-ql"><span class="sc-ol">${i + 1}</span><span>${md(typeof x === 'string' ? x : x.label)}</span></div>`).join('')}<div class="sc-hint">Reply with the order you want, e.g. “2 1 3”, leaving out any to drop.</div></div>`;
       },
       park(b) {
-        return B.ask({ questions: arr(b.items).map((x) => ({ state: 'idle', rec: 'park', ...x })), choices: ['Now', 'Park', 'Drop'], classes: ['next', 'idle', 'stop'] }) + (b.parkAll ? `<div class="sc-act">${button({ label: 'Park all and stop', send: b.parkAll })}</div>` : '');
+        return `<div class="sc-q idle"><div class="sc-qt">Still open</div>${arr(b.items).map((x) => `<div class="sc-ql"><span class="sc-ar">·</span><span>${md(x.text)}</span></div>`).join('')}<div class="sc-hint">Say now, park or drop for each, or “park all”.</div></div>`;
       },
     };
     return arr(spec.blocks).map((b) => {
       const fn = B[b && b.type];
       return fn ? fn(b) : '';
     }).join('');
-  }
-
-  function wire(root, spec, ctx) {
-    const qel = (q) => root.querySelector(`[data-qid="${q.id}"]`);
-    const textOf = (el) => {
-      const t = el.querySelector('.sc-in');
-      return t && !t.closest('[hidden]') ? t.value.trim() : '';
-    };
-    const value = (q) => {
-      const el = qel(q);
-      if (!el) return '';
-      if (q.kind === 'rank') {
-        const rows = [...el.querySelectorAll('.sc-rk')];
-        const on = rows.filter((r) => !r.classList.contains('off')).map((r, i) => `${i + 1}) ${r.dataset.v}`);
-        const off = rows.filter((r) => r.classList.contains('off')).map((r) => r.dataset.v);
-        return on.join(', ') + (off.length ? `; drop: ${off.join(', ')}` : '');
-      }
-      if (q.kind === 'ticks') {
-        const rows = [...el.querySelectorAll('.sc-ckr')].map((r) => [r.dataset.v, r.querySelector('input:checked')?.value]);
-        const group = (k) => rows.filter(([, v]) => v === k).map(([n]) => n);
-        const parts = [['works', group('works')], ['broken', group('broken')], ["didn't try", group('not tried')], ['not marked', rows.filter(([, v]) => !v).map(([n]) => n)]].filter(([, l]) => l.length).map(([k, l]) => `${k}: ${l.join(', ')}`);
-        if (!rows.some(([, v]) => v)) return '';
-        const t = textOf(el);
-        return parts.join('; ') + (t ? `. ${t}` : '');
-      }
-      if (q.kind === 'text') return textOf(el);
-      const r = el.querySelector('input[type=radio]:checked');
-      let v = r ? r.value + (r.hasAttribute('data-rec') ? ' (as you suggested)' : '') : '';
-      const t = textOf(el);
-      if (t) v += (v ? '. ' : '') + t;
-      return v;
-    };
-    const problem = (q) => {
-      const el = qel(q);
-      const v = value(q);
-      if (q.req && !v) return q.kind === 'text' ? 'Write a few words first.' : q.kind === 'ticks' ? 'Mark at least one check.' : 'Pick one first.';
-      if (q.kind === 'text' && q.min && v.length < q.min) return q.msg || `A few more words, at least ${q.min} characters.`;
-      if (q.kind === 'approve' && el.querySelector('input:checked')?.value === 'approved with a change' && !textOf(el)) return 'Say what to change.';
-      return '';
-    };
-    const send = spec.send || {};
-    const goLine = () => root.querySelector('input[data-go]:checked')?.value ?? send.go;
-    const message = () => [send.intro || 'My answers:', ...ctx.qs.map((q) => `- ${q.label}: ${value(q) || 'skipped'}`), goLine()].filter(Boolean).join('\n');
-    const prev = root.querySelector('.sc-prev');
-    const update = () => {
-      ctx.qs.forEach((q) => {
-        const el = qel(q);
-        el?.querySelectorAll('[data-when]').forEach((w) => { w.hidden = el.querySelector('input:checked')?.value !== w.dataset.when; });
-        el?.querySelectorAll('.sc-rk').forEach((r, _, all) => { const on = [...all].filter((x) => !x.classList.contains('off')); r.querySelector('em').textContent = r.classList.contains('off') ? '–' : on.indexOf(r) + 1; });
-      });
-      if (prev) prev.textContent = message();
-    };
-    // sendPrompt adds the text to the user's message box; they press Enter. Buttons stay live so
-    // they can be pressed again, and each message ends with a line break so two don't run together.
-    const go = (text, btn) => {
-      if (typeof sendPrompt === 'function') sendPrompt(text + '\n');
-      else console.log('[session-card] sendPrompt:', text);
-      if (btn && !btn.dataset.label) {
-        btn.dataset.label = btn.innerHTML;
-        btn.innerHTML = `${icon('check')}Added`;
-        setTimeout(() => { btn.innerHTML = btn.dataset.label; delete btn.dataset.label; }, 1500);
-      }
-    };
-    // The card lives in a sandboxed frame where navigator.clipboard is often blocked, so try the
-    // older execCommand copy first (it works inside the click), then the clipboard API, and if both
-    // fail, select the text so the user can press Cmd+C.
-    const flash = (btn, label) => {
-      if (!btn.dataset.label) btn.dataset.label = btn.textContent;
-      btn.textContent = label;
-      clearTimeout(btn._t);
-      btn._t = setTimeout(() => { btn.textContent = btn.dataset.label; delete btn.dataset.label; }, 1800);
-    };
-    const copy = (text, btn) => {
-      let ok = false;
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
-        document.body.appendChild(ta);
-        ta.select();
-        ok = document.execCommand('copy');
-        ta.remove();
-      } catch (e) { ok = false; }
-      if (ok) return flash(btn, 'Copied');
-      const selectIt = () => {
-        const code = btn.parentElement.querySelector('code');
-        if (code) { const r = document.createRange(); r.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-        flash(btn, 'Press ⌘C');
-      };
-      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => flash(btn, 'Copied'), selectIt);
-      else selectIt();
-    };
-    const submit = (btn) => {
-      let first = null;
-      ctx.qs.forEach((q) => {
-        const el = qel(q);
-        const p = problem(q);
-        el.querySelectorAll('.sc-err').forEach((e) => { e.textContent = p; });
-        el.querySelector('.sc-in')?.setAttribute('aria-invalid', p ? 'true' : 'false');
-        if (p && !first) first = el;
-      });
-      if (first) return first.querySelector('input,textarea')?.focus();
-      go(message(), btn);
-    };
-    root.addEventListener('change', update);
-    root.addEventListener('input', (e) => {
-      const el = e.target.closest('[data-qid]');
-      el?.querySelectorAll('.sc-err').forEach((x) => { x.textContent = ''; });
-      e.target.removeAttribute?.('aria-invalid');
-      update();
-    });
-    root.addEventListener('click', (e) => {
-      const t = e.target.closest('button');
-      if (!t) return;
-      if (t.dataset.mv) {
-        const row = t.closest('.sc-rk');
-        const d = t.dataset.mv;
-        if (d === 'x') row.classList.toggle('off');
-        else if (d === '-1' && row.previousElementSibling?.classList.contains('sc-rk')) row.previousElementSibling.before(row);
-        else if (d === '1' && row.nextElementSibling?.classList.contains('sc-rk')) row.nextElementSibling.after(row);
-        update();
-      } else if (t.dataset.copy != null) {
-        copy(t.dataset.copy, t);
-      } else if (t.hasAttribute('data-reset')) {
-        render(root, spec); // redraw exactly as first drawn: recommended picks, nothing typed, original order
-      } else if (t.hasAttribute('data-send')) {
-        submit(t);
-      } else if (t.dataset.p) {
-        go(t.dataset.p, t);
-      }
-    });
-    root.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-        const b = root.querySelector('[data-send]');
-        if (b) { e.preventDefault(); submit(b); }
-      }
-    });
-    update();
   }
 
   function render(target, spec) {
@@ -462,8 +308,7 @@
       s.textContent = CSS;
       document.head.appendChild(s);
     }
-    const uid = Math.random().toString(36).slice(2, 7); // radio names must not clash with another card's
-    const ctx = { qs: [], q(o) { const id = `sc${uid}q${this.qs.length}`; this.qs.push({ id, ...o }); return id; } };
+    const ctx = { n: 0 };
     spec = spec || {};
     // Header line: whose turn (from the first banner) and which session, for people juggling many.
     const blocks = arr(spec.blocks);
@@ -474,15 +319,7 @@
       const s = ban ? derive(blocks, st(ban.state, 'you')) : 'idle';
       head = `<div class="sc-hd ${s}"><span class="sc-dot"></span>${ban ? stateWord(s, ban.title) : ''}<span class="sc-tt">${md(spec.title)}</span>${spec.project ? `<span class="sc-proj">${esc(spec.project)}</span>` : ''}${ban ? `<span class="sc-hm">${md(ban.sub || load(blocks))}</span>` : ''}</div>${spec.about ? `<div class="sc-ab">${md(spec.about)}</div>` : ''}`;
     }
-    let body = renderBlocks(head && ban ? { ...spec, blocks: blocks.filter((_, i) => i !== bi) } : spec, ctx);
-    if (ctx.qs.length) {
-      const send = spec.send || {};
-      const goName = `sc${uid}go`;
-      const goChoice = send.go && send.alt
-        ? `<div class="sc-goline">Then: <span class="sc-seg"><label class="you"><input type="radio" name="${goName}" data-go value="${esc(send.go)}" checked>${esc(send.go)}</label><label class="idle"><input type="radio" name="${goName}" data-go value="${esc(send.alt)}">${esc(send.alt)}</label></span></div>`
-        : send.go ? `<div class="sc-goline">Ends with “${md(send.go)}”</div>` : '';
-      body += `${goChoice}<div class="sc-act"><button type="button" class="sc-go you" data-send title="Puts your answers in your message box; press Enter to send">${esc(send.label || 'Put in my reply')}</button><button type="button" class="sc-link" data-reset>Reset to defaults</button>${arr(send.buttons).map((x) => button(x)).join('')}</div><details class="sc-pv"><summary>Message preview<span class="sc-sh"></span></summary><div class="sc-prev" aria-live="polite"></div></details>`;
-    }
+    const body = renderBlocks(head && ban ? { ...spec, blocks: blocks.filter((_, i) => i !== bi) } : spec, ctx);
     const html = head ? head + (body ? `<div class="sc-body">${body}</div>` : '') : body;
     root.classList.add('sc');
     // The host only gives us theme variables, so read the text colour: light text means a dark screen.
@@ -493,7 +330,6 @@
     root.classList.toggle('sc-dark', dark());
     matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => root.classList.toggle('sc-dark', dark()));
     root.innerHTML = html;
-    wire(root, spec || {}, ctx);
   }
 
   // Plain-text version, for a fallback or a terminal.

@@ -1,10 +1,10 @@
 # session-card
 
-**A status card at the end of every Claude Code turn: what's done, what you need to do, and what Claude does next.**
+**A status card for when Claude has finished and it's your turn: what's done, what you need to do next, and what's blocked.**
 
-Long chat scrollback is hard to scan, especially when you have several sessions going or you have ADHD. With this plugin, every turn ends with a small colour-coded card. You can tell where the session is at a glance, and answer questions from the card, without reading back through the chat.
+Long chat scrollback is hard to scan, especially when you have several sessions going or you have ADHD. With this plugin, when Claude finishes and is waiting on you, the reply ends with a small colour-coded card, so you can see the next thing to do at a glance without reading back through the chat. It only appears when it's genuinely your turn (never while Claude is still waiting on background work), so it stays signal, not noise.
 
-<p align="center"><img src="docs/images/your-turn.png" width="640" alt="A session card: Your turn and the session title on one line, a short description, two arrow lines for what you need to do, one-line summaries of what's done and what Claude does next, a heads-up, and two reply buttons"></p>
+<p align="center"><img src="docs/images/your-turn.png" width="640" alt="A session card: Your turn and the session title on one line, a short description, two arrow lines for what you need to do, one-line summaries of what's done and what Claude does next, and a heads-up"></p>
 
 ## Install
 
@@ -21,9 +21,9 @@ Then restart Claude Code, or start a new session. There's nothing to configure.
 
 ## Using it
 
-1. **Work as usual.** At the end of each turn, Claude adds a card as the last thing in the reply.
+1. **Work as usual.** When Claude has finished and the next move is yours, its reply ends with a card.
 2. **Read the card from the top.** The first line says whose turn it is and which session this is, with a short description underneath, so you know which one you're looking at. Arrows mark what you need to do. What's done and what Claude does next take one line each, and you can tap the done line to see the full list.
-3. **Answer from the card.** Buttons and questions put a ready-written reply into your message box, each on its own line. Change it if you like, then press Enter to send. You can press a button again, or combine several.
+3. **Answer in chat.** The card is information only: no buttons or inputs. Questions are numbered with lettered options and Claude's recommendation marked, so "1a, 2 yes" is a full answer. Claude also ends with a suggested reply, which usually becomes the Tab suggestion in the message box: Tab, then Enter.
 
 The colours always mean the same thing:
 
@@ -57,9 +57,9 @@ A vertical stepper with "you are here", and a count of what's on whom.
 
 ### Lots of items
 
-Counts at the top, then one list with your items first. Each item can have its own answer button, and commands to run come with a copy button.
+One list with your items first, then what's blocked and what Claude does next. Commands for you to run show as code.
 
-<p align="center"><img src="docs/images/scoreboard.png" width="600" alt="Count tiles, then a tagged list of items with an answer button and a command with a copy button"></p>
+<p align="center"><img src="docs/images/scoreboard.png" width="600" alt="A tagged list of items, yours first, and a command to run"></p>
 
 ### Ship check
 
@@ -75,9 +75,9 @@ What changed, how we know it works (observed, tested, inferred or unchecked), an
 
 ### Questions
 
-A decision with Claude's recommendation already selected, a batch of yes/no/later questions, and approve-with-a-tweak. **Put in my reply** gathers every answer into one message in your message box (a folded preview shows the exact text), and the card shows how the reply ends, for example "Go ahead" or "Plan only". **Reset to defaults** puts back Claude's picks. Nothing you have to observe yourself, like test results, is ever pre-filled.
+A decision with lettered options and Claude's recommendation marked, a batch of yes/no/later questions, and a plan to approve. Questions are numbered across the card, and you answer them in chat ("1a, 2 yes").
 
-<p align="center"><img src="docs/images/questions.png" width="600" alt="A decision with a recommended option, yes/no/later rows, an approve control, a violet Put in my reply button and a folded message preview"></p>
+<p align="center"><img src="docs/images/questions.png" width="600" alt="Numbered questions: a decision with lettered options and a recommendation, yes/no/later questions and a plan to approve, each with a hint on how to answer in chat"></p>
 
 ### Test results and priorities
 
@@ -108,7 +108,7 @@ All optional, as environment variables:
 
 | Variable | Effect |
 |---|---|
-| `SESSION_CARD_HOOK=0` | Turns off the stop hook that reminds Claude when a turn ends without a card |
+| `SESSION_CARD_HOOK=0` | Turns off the stop hook that reminds Claude to show a card when it's done and waiting on you |
 | `SESSION_CARD_MIN_TOOLS=3` | Reminds only after turns with at least this many tool calls or a file edit (default 0: every turn) |
 | `SESSION_CARD_TERMINAL=1` | Lets the hook nudge in a plain terminal session too (off by default) |
 
@@ -117,13 +117,13 @@ All optional, as environment variables:
 The plugin has two parts:
 
 - **A skill** (`skills/session-card/SKILL.md`). It tells Claude when and how to draw a card, describes every block, and sets the honesty rules.
-- **A stop hook** (`hooks/stop.py`). If a turn ends without a card in a desktop or mobile session, it nudges Claude once.
+- **A stop hook** (`hooks/stop.py`). When a desktop or mobile turn ends with Claude waiting on you and no card, it nudges Claude once. It stays quiet while background agents, workflows or backgrounded commands are still running (servers and watchers aside).
 
 To draw a card, Claude writes a short JSON spec and passes it to the `show_widget` tool, together with a renderer loaded from this repo through jsDelivr:
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v2.2.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v3.0.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
