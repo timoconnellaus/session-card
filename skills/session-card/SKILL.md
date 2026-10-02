@@ -24,7 +24,7 @@ Use the `show_widget` tool (from the `visualize` MCP server; if it's deferred, l
 ```html
 <h2 class="sr-only">SUMMARY</h2>
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.2/renderer.js" integrity="sha384-RidQGnEfk+sIeelgg/G75FhtbERkIi//fUdTyPLSUHxw4h1RiekOFCEdoL02PzX6" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v2.0.0/renderer.js" integrity="sha384-tES93A/eumpxmJjyqJlNFvpLya6tv4JE5IunM/H6GmlOureJ4ma5MJvbG56zqFDT" crossorigin="anonymous"></script>
 <script>
 const spec = { "project": "repo-name", "title": "TITLE", "about": "ABOUT", "summary": "SUMMARY", "blocks": [ ... ] };
 window.SessionCard ? SessionCard.render('#sc', spec) : (document.getElementById('sc').textContent = spec.summary);
@@ -82,9 +82,9 @@ The banner's state is `you` if anything waits on the user, else `stop` if blocke
 Every block is `{"type": ..., ...}`. Items in lists are a string or `{"text", "lead", "cost", "effort", "meta"}`.
 
 **Status**
-- `banner` `{state, title?, sub?, bar?: [states], icon?}`. Default titles: you "Your turn", done "All done", next "Claude's on it", stop "Blocked". `sub` says how much is on the user ("2 things · about 7 min"). `bar` (3+ states) is one segment per tracked item.
+- `banner` `{state, title?, sub?}`: whose turn. It joins the header line (coloured dot, "Your turn", the session title, project) and `sub` sits at the right end, saying how much is on the user ("2 things · about 7 min"). Default titles: you "Your turn", done "All done", next "Claude's on it", stop "Blocked".
 - `back` `{ago, doing, last, now}`: where you left off. Above the banner, only on the first card after a break.
-- `lanes` `{lanes: [{state, items, hot?, title?, foldSummary?}]}`: sections stacked one under another (the whole card reads top to bottom). Default titles: done "Done", you "Your move", next "Then Claude", stop "Blocked". A `you` lane is numbered.
+- `lanes` `{lanes: [{state, items, title?, foldSummary?}]}`: the heart of most cards. `you` and `stop` items show as arrow lines (3 at most, the rest folded). `done` becomes one line ("✓ 5 done · first few…") that opens to the full list; `foldSummary` replaces the gist. `next` ("↳ Then Claude: …") and `idle` are one line each.
 - `step` `{title, checks?: [text], cost?, effort?, label?}`: one big next action with a local checklist. For "if you only do one thing" and low-energy cards.
 - `track` `{stages: [{label, state}]}`: a vertical stepper, 3–6 stages with "you are here".
 - `tiles` `{tiles: [{state, label, value}]}`: counts.

@@ -4,7 +4,7 @@
 
 Long chat scrollback is hard to scan, especially when you have several sessions going or you have ADHD. With this plugin, every turn ends with a small colour-coded card. You can tell where the session is at a glance, and answer questions from the card, without reading back through the chat.
 
-<p align="center"><img src="docs/images/your-turn.png" width="640" alt="A session card: the session's title and summary, a violet Your turn banner, then Done, Your move and Then Claude sections, a heads-up, and two reply buttons"></p>
+<p align="center"><img src="docs/images/your-turn.png" width="640" alt="A session card: Your turn and the session title on one line, a short description, two arrow lines for what you need to do, one-line summaries of what's done and what Claude does next, a heads-up, and two reply buttons"></p>
 
 ## Install
 
@@ -22,7 +22,7 @@ Then restart Claude Code, or start a new session. There's nothing to configure.
 ## Using it
 
 1. **Work as usual.** At the end of each turn, Claude adds a card as the last thing in the reply.
-2. **Read the card from the top.** The header names the session and says what it's about, so you know which one you're looking at. The coloured banner says whose turn it is. The sections below list what's done, what's yours, and what Claude does next.
+2. **Read the card from the top.** The first line says whose turn it is and which session this is, with a short description underneath, so you know which one you're looking at. Arrows mark what you need to do. What's done and what Claude does next take one line each, and you can tap the done line to see the full list.
 3. **Answer from the card.** Buttons and questions put a ready-written reply into your message box, each on its own line. Change it if you like, then press Enter to send. You can press a button again, or combine several.
 
 The colours always mean the same thing:
@@ -122,7 +122,7 @@ To draw a card, Claude writes a short JSON spec and passes it to the `show_widge
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.2/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v2.0.0/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
