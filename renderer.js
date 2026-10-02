@@ -2,7 +2,7 @@
    Runs inside a Claude chat widget. Uses the host's theme CSS variables,
    Tabler outline icons (`ti ti-*`) and the global sendPrompt(text). */
 (function () {
-  const VERSION = '1.7.1';
+  const VERSION = '1.7.2';
 
   const CSS = `
 .sc{display:flex;flex-direction:column;gap:12px;padding:4px 0;font-size:14px;color:var(--text-primary)}
@@ -303,6 +303,36 @@
         setTimeout(() => { btn.innerHTML = btn.dataset.label; delete btn.dataset.label; }, 1500);
       }
     };
+    // The card lives in a sandboxed frame where navigator.clipboard is often blocked, so try the
+    // older execCommand copy first (it works inside the click), then the clipboard API, and if both
+    // fail, select the text so the user can press Cmd+C.
+    const flash = (btn, label) => {
+      if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+      btn.textContent = label;
+      clearTimeout(btn._t);
+      btn._t = setTimeout(() => { btn.textContent = btn.dataset.label; delete btn.dataset.label; }, 1800);
+    };
+    const copy = (text, btn) => {
+      let ok = false;
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand('copy');
+        ta.remove();
+      } catch (e) { ok = false; }
+      if (ok) return flash(btn, 'Copied');
+      const selectIt = () => {
+        const code = btn.parentElement.querySelector('code');
+        if (code) { const r = document.createRange(); r.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+        flash(btn, 'Press ⌘C');
+      };
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => flash(btn, 'Copied'), selectIt);
+      else selectIt();
+    };
     const submit = (btn) => {
       let first = null;
       ctx.qs.forEach((q) => {
@@ -333,8 +363,7 @@
         else if (d === '1' && row.nextElementSibling?.classList.contains('sc-rk')) row.nextElementSibling.after(row);
         update();
       } else if (t.dataset.copy != null) {
-        navigator.clipboard?.writeText(t.dataset.copy);
-        t.textContent = 'Copied';
+        copy(t.dataset.copy, t);
       } else if (t.hasAttribute('data-reset')) {
         render(root, spec); // redraw exactly as first drawn: recommended picks, nothing typed, original order
       } else if (t.hasAttribute('data-send')) {

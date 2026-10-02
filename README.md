@@ -122,7 +122,7 @@ To draw a card, Claude writes a short JSON spec and passes it to the `show_widge
 
 ```html
 <div id="sc"></div>
-<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.1/renderer.js" integrity="…" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/timoconnellaus/session-card@v1.7.2/renderer.js" integrity="…" crossorigin="anonymous"></script>
 <script>SessionCard.render('#sc', { title: "…", about: "…", blocks: [ … ] })</script>
 ```
 
